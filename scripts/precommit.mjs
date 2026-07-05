@@ -1,24 +1,50 @@
+/**
+ * precommit.mjs
+ * Production-grade pre-commit runner.
+ *
+ * Philosophy (2026 best practice):
+ *  - Pre-commit must be FAST (<10s) — only lint & format STAGED files
+ *  - TypeScript type-checking (tsc --noEmit) belongs in CI/CD, not pre-commit
+ *  - Use --no-verify for emergency commits: git commit --no-verify
+ */
+
 import chalk from 'chalk';
 import { execSync } from 'child_process';
 
-const steps = [
-  { label: 'Step 1: Linting', command: 'npx lint-staged' },
-  { label: 'Step 2: Type Checking', command: 'npx tsc --noEmit' },
-  // { label: "Step 3: Build", command: "npm run build" },
-];
+// ─── Helpers ────────────────────────────────────────────────────────────────
 
-console.log(chalk.cyan('\n🚀 Starting pre-commit checks'));
-console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+const DIVIDER = chalk.dim('─'.repeat(50));
 
-for (const step of steps) {
-  console.log(`\n🔧 ${chalk.yellow(step.label)}`);
+function run(label, command) {
+  const start = performance.now();
+  process.stdout.write(`\n${chalk.bold.cyan('▶')} ${chalk.bold(label)}\n`);
+
   try {
-    execSync(step.command, { stdio: 'inherit' });
-    console.log(chalk.green('✅ Passed!'));
+    execSync(command, { stdio: 'inherit' });
+    const ms = Math.round(performance.now() - start);
+    console.log(`${chalk.green('✔')} ${chalk.dim(`passed in ${ms}ms`)}`);
   } catch {
-    console.error(chalk.red(`❌ ${step.label} failed!`));
+    const ms = Math.round(performance.now() - start);
+    console.error(`${chalk.red('✖')} ${chalk.red.bold(`${label} failed`)} ${chalk.dim(`(${ms}ms)`)}`);
+    console.error(chalk.dim('  Tip: fix the issues above, or use git commit --no-verify to bypass'));
     process.exit(1);
   }
 }
 
-console.log(chalk.green("\n🎉 All checks passed! You're good to commit.\n"));
+// ─── Pre-commit Pipeline ─────────────────────────────────────────────────────
+
+const totalStart = performance.now();
+
+console.log(`\n${chalk.bold.blue('🔍 Pre-commit checks')}`);
+console.log(DIVIDER);
+console.log(chalk.dim('  Only staged files will be checked (via lint-staged)'));
+
+// Step 1: Lint + Format staged files only
+run('Lint & Format (lint-staged)', 'npx lint-staged');
+
+// ─── Done ────────────────────────────────────────────────────────────────────
+
+const totalMs = Math.round(performance.now() - totalStart);
+console.log(`\n${DIVIDER}`);
+console.log(`${chalk.bold.green('✅ All checks passed!')} ${chalk.dim(`(${totalMs}ms total)`)}`);
+console.log(chalk.dim('  Proceeding with commit...\n'));

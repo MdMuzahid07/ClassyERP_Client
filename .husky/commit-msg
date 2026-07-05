@@ -1,0 +1,1 @@
+node scripts/commitlint.mjs "$1"
