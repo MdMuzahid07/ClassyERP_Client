@@ -1,4 +1,26 @@
-/dist
-/node_modules
-/coverage
+# Build output
+dist
+dist-ssr
+build
+
+# Dependencies
+node_modules
+
+# Test coverage
+coverage
+
+# Lock files (never format these — causes noise and merge conflicts)
 package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Auto-generated files
+*.min.js
+*.min.css
+
+# Public assets (binary/static)
+public
+
+# Environment files
+.env
+.env.*
