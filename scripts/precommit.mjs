@@ -2,9 +2,9 @@ import chalk from 'chalk';
 import { execSync } from 'child_process';
 
 const steps = [
-  { label: 'Step 1: Linting', command: 'yarn lint-staged' },
-  { label: 'Step 2: Type Checking', command: 'yarn type-check' },
-  // { label: "Step 3: Build", command: "yarn build" },
+  { label: 'Step 1: Linting', command: 'npx lint-staged' },
+  { label: 'Step 2: Type Checking', command: 'npx tsc --noEmit' },
+  // { label: "Step 3: Build", command: "npm run build" },
 ];
 
 console.log(chalk.cyan('\n🚀 Starting pre-commit checks'));
