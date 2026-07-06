@@ -168,7 +168,14 @@ WebSocket connectivity enables instant, multi-client synchronization. To prevent
   - **Disconnects**: Calls `disconnectSocket()` upon logout or when the token becomes null.
   - **Handshake Validation**: If the socket server rejects the connection (expired/invalid token), the handler dispatches `logout()` and redirects to `/login`.
 
-### 2. Real-Time UI Sync & Optimistic Caching
+### 2. Serverless Optimization (Vercel)
+
+Since serverless hosting environments (like Vercel) do not support persistent stateful processes or WebSockets natively:
+
+- **WebSocket Transport Only**: The client restricts connection protocols strictly to `transports: ['websocket']`. This prevents the client from falling back to HTTP long polling, which otherwise floods Vercel serverless functions with endless requests.
+- **Flood Prevention Safeguards**: Reconnection loops are capped with `reconnectionAttempts: 3` and `reconnectionDelay: 10000` (10 seconds delay) to prevent infinite loops, safeguarding Vercel serverless execution limits and preventing MongoDB database connection pool exhaustion.
+
+### 3. Real-Time UI Sync & Optimistic Caching
 
 Instead of spamming the server with full refetch queries on every event, we listen to real-time events and patch or invalidate local caches accordingly:
 

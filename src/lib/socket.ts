@@ -13,6 +13,9 @@ export const connectSocket = (token: string) => {
   socket = io(socketUrl, {
     auth: { token },
     autoConnect: true,
+    transports: ['websocket'], // Disable HTTP polling to prevent flooding Vercel
+    reconnectionAttempts: 3, // Prevent infinite reconnection loops
+    reconnectionDelay: 10000, // Wait 10 seconds between attempts
   });
 
   socket.on('connect_error', (error) => {
