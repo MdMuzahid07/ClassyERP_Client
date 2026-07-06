@@ -32,11 +32,10 @@ export const LowStockTable: React.FC<LowStockTableProps> = ({ products }) => {
   const handleRestockConfirm = async () => {
     if (!restockProduct) return;
     try {
-      const formData = new FormData();
       const nextQuantity = restockProduct.stockQuantity + addedQuantity;
-      formData.append('stockQuantity', String(nextQuantity));
+      const data = { stockQuantity: nextQuantity };
 
-      await updateProduct({ id: restockProduct._id, formData }).unwrap();
+      await updateProduct({ id: restockProduct._id, data }).unwrap();
       toast.success(`Successfully restocked "${restockProduct.name}" to ${nextQuantity} units.`);
       handleCloseModal();
     } catch (err: unknown) {

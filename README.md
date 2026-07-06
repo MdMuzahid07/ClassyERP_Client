@@ -28,7 +28,7 @@ This document serves as the absolute onboarding blueprint for new developers to 
 - **Real-time Connection**: Socket.io-client (v4)
 - **Form & Validation**: React Hook Form + Zod Resolver
 - **Styling**: Tailwind CSS
-- **Asset Library**: Lucide React, Sonner (Toasts)
+- **Asset & Media Utilities**: Lucide React, Sonner (Toasts), React Dropzone (drag & drop)
 
 ---
 
@@ -64,7 +64,7 @@ client/src/
 │   └── NotFound.tsx      # Customized 404 fallback page container
 ├── redux/                # Redux state slices and RTK Query endpoints
 │   ├── api/              # baseApi.ts registering global tagTypes and headers
-│   └── features/         # Sub-folder APIs (authApi.ts, productsApi.ts, salesApi.ts, etc.)
+│   └── features/         # Sub-folder APIs (authApi.ts, productsApi.ts, salesApi.ts, upload/uploadApi.ts)
 ├── routes/               # Routing map registries (AppRoutes.tsx)
 ├── skeleton/             # Dedicated directory containing all page skeleton loaders
 │   ├── DashboardSkeleton.tsx
@@ -108,6 +108,15 @@ Data fetching, caching, and cache invalidation are fully managed using RTK Query
 - **`"Sale"`**: Sales ledger results are cached. Invalidated when a checkout order is committed.
 - **`"User"`**: User accounts registry cache. Invalidated on user creation, profile edits, status toggles, or deletions.
 
+### ☁️ Media Upload Pipeline (Two-Step Flow)
+
+Instead of overloading REST routes with raw `multipart/form-data` uploads, the frontend decouples media uploads from form submission:
+
+1. **Instant Asset Upload**: Powered by `react-dropzone`. As soon as the user drops or selects an image in `<ImageUploadField />`, it immediately triggers the `uploadImage` mutation (`POST /upload/image`) carrying the raw file in FormData.
+2. **Visual Feedback & Safeguards**: During the upload, a loading spinner overlay covers the image field, and the main "Create" button is disabled (showing "Uploading Image...") to prevent premature submissions.
+3. **Cloudinary Hosting**: The backend receives the file, uploads it to Cloudinary, and returns a payload containing the `secure_url`.
+4. **JSON Form Submission**: The client stores the secure URL in state, and when the user clicks "Create Product", it submits the final data payload as a lightweight JSON body (e.g. `POST /products` or `PATCH /products/:id`).
+
 ### Live Cache Invalidation Lifecycle Example
 
 ```mermaid
@@ -136,13 +145,14 @@ We maintain a strict separation between **Client State** and **Server State**:
 ### 1. Client State
 
 - **Global Auth Session**: Handled in `authSlice.ts`. Stores the active user profile (`User | null`) and authorization tokens. Synchronized with `localStorage` for page-reload persistence.
-- **Form States**: Localized within components using `react-hook-form` (Zod-validated). Unsubmitted inputs are preserved on server errors (like stock shortfalls) and only cleared on a successful API response.
+- **Form States**: Localized within components using `react-hook-form` (Zod-validated). Unsubmitted inputs are preserved on server errors (like stock shortfalls) and only cleared on a successful API response. Custom components and Base UI primitives (such as the account status checkbox) are bound through a `<Controller>` element using `checked` and `onCheckedChange` events to ensure accurate state integrations.
 - **UI States**: Modal open states, dropdown selectors, theme states (Dark/Light), active paginations are strictly localized.
 
 ### 2. Server State (RTK Query)
 
 - Read operations map to queries (`useGetProductsQuery`, `useGetSalesQuery`, etc.). All loading screens return skeletons during fetch delays.
 - Write operations map to mutations (`useCreateProductMutation`, `useUpdateUserMutation`, etc.). Submit buttons are disabled and show spinner states during execution.
+- **Optimistic Updates**: Key user interface operations (like toggling account activation statuses) implement optimistic updates via RTK Query `onQueryStarted` cache interception. This makes actions feel instant by updating the cache state immediately and automatically rolling back changes if the server request fails.
 
 ---
 
@@ -247,3 +257,30 @@ We use soft, bordered badges to represent stock and user roles:
 - **Critical Stock ($\le 2$)**: `bg-red-50 text-red-700 border-red-200`
 - **Low Stock ($< 5$)**: `bg-amber-50 text-amber-700 border-amber-200`
 - **Healthy Stock ($\ge 5$)**: `bg-emerald-50 text-emerald-700 border-emerald-200`
+
+### 4. Custom Theme Configurations (Tailwind v4)
+
+We extend standard theme palettes in the CSS `@theme` registry using custom CSS variables connected to light/dark themes:
+
+- **`bg-sidebar`**: Maps directly to `var(--sidebar-background)`. Replaces browser-default transparency on the mobile sidebar overlay panel, providing a solid surface matching the current active theme color scheme.
+- **`border-sidebar-border`**: Custom border style mapping dynamically to the theme's sidebar border color, keeping visual contrast high.
+
+---
+
+## ✨ Recent Enhancements
+
+### 1. Reusable Layout & Navigation Architecture
+
+- **SidebarContent Refactoring**: Extracted and exported the core navigation rendering code into a standalone `SidebarContent` component inside [Sidebar.tsx](file:///home/muzahid/MainDrive/Developments/MyPortfolio/MERN-Stack/ClassyERP/client/src/components/layout/Sidebar.tsx). This allows [MobileDrawer.tsx](file:///home/muzahid/MainDrive/Developments/MyPortfolio/MERN-Stack/ClassyERP/client/src/components/layout/MobileDrawer.tsx) to reuse the navigation links with active routing indicators and automatically invoke an `onItemClick` callback to close the drawer upon navigation.
+- **Sidebar theme registration**: Registered the `--color-sidebar` utility class dynamically inside the Tailwind CSS `@theme` configuration in [index.css](file:///home/muzahid/MainDrive/Developments/MyPortfolio/MERN-Stack/ClassyERP/client/src/index.css). This resolves drawer transparency bugs in mobile viewports, applying a solid background color based on the active dark/light mode.
+- **Sidebar border styling**: Configured the sidebar layout to use the custom themed `border-sidebar-border` class on desktop views instead of falling back to default black.
+
+### 2. Upgraded Product Creation & Media Upload Flow
+
+- **Client-Side Image Uploads via React Dropzone**: Integrated `react-dropzone` for drag-and-drop file uploads. Refactored the file upload architecture to upload image files to Cloudinary on the client-side first via [uploadApi.ts](file:///home/muzahid/MainDrive/Developments/MyPortfolio/MERN-Stack/ClassyERP/client/src/redux/features/upload/uploadApi.ts). Once a secure URL is returned, the product creation/update request is sent to the backend as a standard JSON body instead of raw multipart form data.
+- **Random SKU Generator**: Integrated a random SKU generator tool into the [ProductFormDialog.tsx](file:///home/muzahid/MainDrive/Developments/MyPortfolio/MERN-Stack/ClassyERP/client/src/features/products/ProductFormDialog.tsx) form, allowing users to instantly generate clean identifiers matching the format `CLSY-[AA-ZZ]-[10000-99999]`.
+- **Predefined Category Dropdown**: Replaced the text input for categories in the Product dialog with a custom select element loaded with static categories (Electronics, Apparel, Sports, Home, etc.) to streamline inventory catalog classification.
+
+### 3. User Form State Correction
+
+- **Checkbox State Binding**: Bound the custom Base UI checkbox component inside [UserFormDialog.tsx](file:///home/muzahid/MainDrive/Developments/MyPortfolio/MERN-Stack/ClassyERP/client/src/features/users/UserFormDialog.tsx) using React Hook Form's `Controller`. This resolves a state rendering bug where active user accounts were incorrectly rendered with unchecked status toggles.

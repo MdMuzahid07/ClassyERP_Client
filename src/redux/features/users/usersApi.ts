@@ -75,7 +75,10 @@ export const usersApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'User', id: 'LIST' }],
       transformResponse: (response: UserResponse) => response.data,
     }),
-    updateUser: builder.mutation<User, { id: string; userData: Partial<User> }>({
+    updateUser: builder.mutation<
+      User,
+      { id: string; userData: Partial<User>; queryParams?: UsersQueryParams }
+    >({
       query: ({ id, userData }) => ({
         url: `/auth/users/${id}`,
         method: 'PATCH',
@@ -86,6 +89,22 @@ export const usersApi = baseApi.injectEndpoints({
         { type: 'User', id: 'LIST' },
       ],
       transformResponse: (response: UserResponse) => response.data,
+      async onQueryStarted({ id, userData, queryParams }, { dispatch, queryFulfilled }) {
+        if (!queryParams) return;
+        const patchResult = dispatch(
+          usersApi.util.updateQueryData('getUsers', queryParams, (draft) => {
+            const user = draft.users.find((u) => u._id === id);
+            if (user) {
+              Object.assign(user, userData);
+            }
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
     }),
     deleteUser: builder.mutation<{ success: boolean; message: string }, string>({
       query: (id) => ({

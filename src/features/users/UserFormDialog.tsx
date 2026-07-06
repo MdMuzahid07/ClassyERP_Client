@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { type User } from '../../types/user';
@@ -53,6 +53,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({ isOpen, onClose,
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<UserFormInputValues>({
     resolver: zodResolver(isEdit ? editUserSchema : createUserSchema),
@@ -237,7 +238,13 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({ isOpen, onClose,
                   Allows user to login and access system features.
                 </p>
               </div>
-              <Checkbox disabled={isLoading} {...register('isActive')} />
+              <Controller
+                control={control}
+                name="isActive"
+                render={({ field: { value, onChange } }) => (
+                  <Checkbox disabled={isLoading} checked={!!value} onCheckedChange={onChange} />
+                )}
+              />
             </div>
           </div>
 

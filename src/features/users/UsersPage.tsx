@@ -63,6 +63,7 @@ export const UsersPage: React.FC = () => {
       await updateUser({
         id: user._id,
         userData: { isActive: !user.isActive },
+        queryParams: { search, page, limit },
       }).unwrap();
       toast.success(`User account ${!user.isActive ? 'activated' : 'deactivated'} successfully!`);
     } catch (err: unknown) {

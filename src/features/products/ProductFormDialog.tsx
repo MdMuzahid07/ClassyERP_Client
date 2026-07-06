@@ -7,9 +7,23 @@ import {
   useCreateProductMutation,
   useUpdateProductMutation,
 } from '../../redux/features/products/productsApi';
+import { useUploadImageMutation } from '../../redux/features/upload/uploadApi';
 import { ImageUploadField } from '../../components/shared/ImageUploadField';
 import { X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+
+const STATIC_CATEGORIES = [
+  'Electronics',
+  'Apparel & Accessories',
+  'Home & Kitchen',
+  'Sports & Fitness',
+  'Beauty & Personal Care',
+  'Office Supplies',
+  'Books & Stationery',
+  'Grocery & Beverages',
+  'Automotive',
+  'Toys & Games',
+];
 
 import { createPortal } from 'react-dom';
 
@@ -45,9 +59,15 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
   const isEdit = !!product;
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
-  const isLoading = isCreating || isUpdating;
+  const [uploadImage] = useUploadImageMutation();
 
   const [imageFile, setImageFile] = useState<File | string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const isLoading = isCreating || isUpdating;
+  const isFormDisabled = isLoading || isUploadingImage;
+
   const [prevProduct, setPrevProduct] = useState<Product | null | undefined>(undefined);
   const [prevIsOpen, setPrevIsOpen] = useState(false);
 
@@ -56,6 +76,8 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
     setPrevProduct(product);
     if (isOpen) {
       setImageFile(product ? product.image : null);
+      setImageUrl(product ? product.image : null);
+      setIsUploadingImage(false);
     }
   }
 
@@ -64,10 +86,18 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
     handleSubmit,
     reset,
     setError,
+    setValue,
     formState: { errors },
   } = useForm<ProductSchemaType>({
     resolver: zodResolver(productSchema),
   });
+
+  const handleGenerateSKU = () => {
+    const randomDigits = Math.floor(10000 + Math.random() * 90000); // 5 digits
+    const randomChar = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // A-Z
+    const randomChar2 = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // A-Z
+    setValue('sku', `CLSY-${randomChar}${randomChar2}-${randomDigits}`, { shouldValidate: true });
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -95,34 +125,54 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
     }
   }, [isOpen, product, reset]);
 
-  const handleImageChange = (file: File | null) => {
+  const handleImageChange = async (file: File | null) => {
     setImageFile(file);
+    if (!file) {
+      setImageUrl(null);
+      return;
+    }
+
+    if (file instanceof File) {
+      setIsUploadingImage(true);
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+      try {
+        const uploadResult = await uploadImage(uploadFormData).unwrap();
+        setImageUrl(uploadResult.secure_url);
+      } catch {
+        toast.error('Failed to upload product image.');
+        setImageFile(null);
+        setImageUrl(null);
+      } finally {
+        setIsUploadingImage(false);
+      }
+    } else if (typeof file === 'string') {
+      setImageUrl(file);
+    }
   };
 
   const onSubmit = async (data: ProductSchemaType) => {
-    if (!isEdit && !imageFile) {
+    if (!isEdit && !imageUrl) {
       setError('image', { message: 'Product image is required' });
       return;
     }
 
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('sku', data.sku);
-    formData.append('category', data.category);
-    formData.append('purchasePrice', String(data.purchasePrice));
-    formData.append('sellingPrice', String(data.sellingPrice));
-    formData.append('stockQuantity', String(data.stockQuantity));
-
-    if (imageFile instanceof File) {
-      formData.append('image', imageFile);
-    }
+    const payload = {
+      name: data.name,
+      sku: data.sku,
+      category: data.category,
+      purchasePrice: Number(data.purchasePrice),
+      sellingPrice: Number(data.sellingPrice),
+      stockQuantity: Number(data.stockQuantity),
+      image: imageUrl ?? '',
+    };
 
     try {
       if (isEdit && product) {
-        await updateProduct({ id: product._id, formData }).unwrap();
+        await updateProduct({ id: product._id, data: payload }).unwrap();
         toast.success('Product updated successfully!');
       } else {
-        await createProduct(formData).unwrap();
+        await createProduct(payload).unwrap();
         toast.success('Product created successfully!');
       }
       onClose();
@@ -166,7 +216,11 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
             {/* Image Upload Row */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-semibold text-foreground">Product Image</label>
-              <ImageUploadField onChange={handleImageChange} value={imageFile} />
+              <ImageUploadField
+                onChange={handleImageChange}
+                value={imageFile}
+                isUploading={isUploadingImage}
+              />
             </div>
 
             {/* Product Name */}
@@ -195,9 +249,18 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* SKU */}
               <div className="space-y-1">
-                <label htmlFor="sku" className="block text-xs font-semibold text-foreground">
-                  SKU
-                </label>
+                <div className="flex justify-between items-center">
+                  <label htmlFor="sku" className="block text-xs font-semibold text-foreground">
+                    SKU
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleGenerateSKU}
+                    className="text-[10px] text-blue-600 hover:underline font-semibold cursor-pointer"
+                  >
+                    Generate Random SKU
+                  </button>
+                </div>
                 <Input
                   id="sku"
                   type="text"
@@ -207,7 +270,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                       ? 'border-red-200 focus-visible:ring-red-600/5 focus-visible:border-red-500'
                       : ''
                   }
-                  placeholder="FITN-YOGA-01"
+                  placeholder="CLSY-AA-12345"
                   disabled={isLoading}
                 />
                 {errors.sku?.message && (
@@ -222,18 +285,25 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                 <label htmlFor="category" className="block text-xs font-semibold text-foreground">
                   Category
                 </label>
-                <Input
+                <select
                   id="category"
-                  type="text"
-                  {...register('category')}
-                  className={
-                    errors.category
-                      ? 'border-red-200 focus-visible:ring-red-600/5 focus-visible:border-red-500'
-                      : ''
-                  }
-                  placeholder="Fitness"
                   disabled={isLoading}
-                />
+                  {...register('category')}
+                  className={`block w-full h-9 rounded-lg border border-input px-3 text-sm text-foreground bg-card focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all ${
+                    errors.category
+                      ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
+                      : ''
+                  }`}
+                >
+                  <option value="" disabled>
+                    Select Category
+                  </option>
+                  {STATIC_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
                 {errors.category?.message && (
                   <p className="text-[10px] font-semibold text-red-600 mt-1">
                     {errors.category.message}
@@ -334,7 +404,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
             <Button
               type="button"
               variant="outline"
-              disabled={isLoading}
+              disabled={isFormDisabled}
               onClick={onClose}
               className="cursor-pointer"
             >
@@ -342,11 +412,19 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || (!isEdit && !imageFile)}
+              disabled={isFormDisabled || (!isEdit && !imageUrl)}
               className="cursor-pointer"
             >
-              {isLoading && <Loader2 className="h-3 w-3 animate-spin" />}
-              {isEdit ? 'Save Changes' : 'Create Product'}
+              {(isLoading || isUploadingImage) && (
+                <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+              )}
+              {isUploadingImage
+                ? 'Uploading Image...'
+                : isLoading
+                  ? 'Saving...'
+                  : isEdit
+                    ? 'Save Changes'
+                    : 'Create Product'}
             </Button>
           </div>
         </form>

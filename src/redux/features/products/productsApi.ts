@@ -59,20 +59,20 @@ export const productsApi = baseApi.injectEndpoints({
         meta: response.meta ?? { page: 1, limit: 10, total: 0, totalPage: 1 },
       }),
     }),
-    createProduct: builder.mutation<Product, FormData>({
-      query: (formData) => ({
+    createProduct: builder.mutation<Product, Partial<Product>>({
+      query: (data) => ({
         url: '/products',
         method: 'POST',
-        body: formData,
+        body: data,
       }),
       invalidatesTags: [{ type: 'Product', id: 'LIST' }, 'Dashboard'],
       transformResponse: (response: ProductResponse) => response.data,
     }),
-    updateProduct: builder.mutation<Product, { id: string; formData: FormData }>({
-      query: ({ id, formData }) => ({
+    updateProduct: builder.mutation<Product, { id: string; data: Partial<Product> }>({
+      query: ({ id, data }) => ({
         url: `/products/${id}`,
         method: 'PATCH',
-        body: formData,
+        body: data,
       }),
       invalidatesTags: (_result, _error, { id }) => [
         { type: 'Product', id },
