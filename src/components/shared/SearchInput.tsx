@@ -60,13 +60,13 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     <form onSubmit={handleSearchSubmit} className="flex w-full max-w-md items-center gap-2">
       <div className="relative flex-1">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <Search className="h-4 w-4 text-slate-400" />
+          <Search className="h-4 w-4 text-muted-foreground" />
         </div>
         <input
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="block w-full h-9 rounded-lg border border-slate-300 pl-10 pr-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors bg-white text-slate-900"
+          className="block w-full h-9 rounded-lg border border-border pl-10 pr-3 text-sm placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors bg-card text-foreground"
           placeholder={placeholder}
         />
       </div>

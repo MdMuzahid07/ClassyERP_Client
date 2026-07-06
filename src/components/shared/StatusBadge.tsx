@@ -10,13 +10,16 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ quantity }) => {
 
   if (quantity <= 2) {
     text = 'Critical';
-    colorClasses = 'bg-red-50 text-red-700 border-red-200';
+    colorClasses =
+      'bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/50';
   } else if (quantity < 5) {
     text = 'Low Stock';
-    colorClasses = 'bg-amber-50 text-amber-700 border-amber-200';
+    colorClasses =
+      'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/50';
   } else {
     text = 'Healthy';
-    colorClasses = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    colorClasses =
+      'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50';
   }
 
   return (

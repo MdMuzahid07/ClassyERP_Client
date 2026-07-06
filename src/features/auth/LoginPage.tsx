@@ -57,60 +57,63 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8 overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center bg-background text-foreground px-4 py-12 sm:px-6 lg:px-8 overflow-hidden">
       <ParticlesBackground />
+
       <div className="relative w-full max-w-sm space-y-8 z-10">
         <div className="text-center flex flex-col items-center">
           <ClassyLogo className="h-14 mb-2" />
-          <p className="text-sm text-slate-500 font-medium">Inventory & Sales Management System</p>
+          <p className="text-sm text-muted-foreground font-medium">
+            Inventory & Sales Management System
+          </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl ring-1 ring-slate-900/5 p-6 sm:p-8">
+        <div className="bg-card text-card-foreground border border-border rounded-2xl shadow-xl p-6 sm:p-8">
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
                 Email address
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <Mail className="h-5 w-5 text-slate-400" />
+                  <Mail className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <input
                   id="email"
                   type="email"
                   autoComplete="email"
                   {...register('email')}
-                  className={`block w-full rounded-lg border pl-10 pr-3 py-2.5 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
+                  className={`block w-full rounded-lg border pl-10 pr-3 py-2.5 text-sm text-foreground bg-card placeholder-muted-foreground focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
                     errors.email
                       ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
-                      : 'border-slate-200'
+                      : 'border-border'
                   }`}
                   placeholder="name@company.com"
                   disabled={isLoading}
                 />
               </div>
-              {errors.email && (
+              {errors.email?.message && (
                 <p className="mt-1.5 text-xs text-red-600">{errors.email.message}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1">
                 Password
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <Lock className="h-5 w-5 text-slate-400" />
+                  <Lock className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   {...register('password')}
-                  className={`block w-full rounded-lg border pl-10 pr-10 py-2.5 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
+                  className={`block w-full rounded-lg border pl-10 pr-10 py-2.5 text-sm text-foreground bg-card placeholder-muted-foreground focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
                     errors.password
                       ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
-                      : 'border-slate-200'
+                      : 'border-border'
                   }`}
                   placeholder="••••••••"
                   disabled={isLoading}
@@ -118,20 +121,20 @@ export const LoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground focus:outline-none"
                   disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-              {errors.password && (
+              {errors.password?.message && (
                 <p className="mt-1.5 text-xs text-red-600">{errors.password.message}</p>
               )}
             </div>
 
-            {errors.root && (
-              <div className="rounded-lg bg-red-50 border border-red-200 p-3">
-                <p className="text-xs text-red-600">{errors.root.message}</p>
+            {errors.root?.message && (
+              <div className="rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 p-3">
+                <p className="text-xs text-red-600 dark:text-red-400">{errors.root.message}</p>
               </div>
             )}
 
@@ -152,11 +155,11 @@ export const LoginPage: React.FC = () => {
               </button>
 
               <div className="relative flex py-1 items-center">
-                <div className="flex-grow border-t border-slate-200"></div>
-                <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-medium uppercase tracking-wider">
+                <div className="flex-grow border-t border-border"></div>
+                <span className="flex-shrink mx-4 text-muted-foreground text-[10px] font-medium uppercase tracking-wider">
                   Dev Sandbox
                 </span>
-                <div className="flex-grow border-t border-slate-200"></div>
+                <div className="flex-grow border-t border-border"></div>
               </div>
 
               <div className="grid grid-cols-3 gap-2">
@@ -167,7 +170,7 @@ export const LoginPage: React.FC = () => {
                     setValue('password', 'AdminPass123!');
                     toast.success('Admin credentials loaded!');
                   }}
-                  className="flex justify-center items-center rounded-lg border border-dashed border-blue-200 bg-blue-50/30 hover:bg-blue-50/70 py-1.5 text-[10px] font-semibold text-blue-600 transition-colors cursor-pointer"
+                  className="flex justify-center items-center rounded-lg border border-dashed border-blue-600/20 dark:border-blue-500/30 bg-blue-50/10 dark:bg-blue-950/10 hover:bg-blue-50/20 dark:hover:bg-blue-950/25 py-1.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 transition-colors cursor-pointer"
                 >
                   Admin
                 </button>
@@ -178,7 +181,7 @@ export const LoginPage: React.FC = () => {
                     setValue('password', 'UserPass123!');
                     toast.success('Manager credentials loaded!');
                   }}
-                  className="flex justify-center items-center rounded-lg border border-dashed border-blue-200 bg-blue-50/30 hover:bg-blue-50/70 py-1.5 text-[10px] font-semibold text-blue-600 transition-colors cursor-pointer"
+                  className="flex justify-center items-center rounded-lg border border-dashed border-blue-600/20 dark:border-blue-500/30 bg-blue-50/10 dark:bg-blue-950/10 hover:bg-blue-50/20 dark:hover:bg-blue-950/25 py-1.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 transition-colors cursor-pointer"
                 >
                   Manager
                 </button>
@@ -189,7 +192,7 @@ export const LoginPage: React.FC = () => {
                     setValue('password', 'UserPass123!');
                     toast.success('Employee credentials loaded!');
                   }}
-                  className="flex justify-center items-center rounded-lg border border-dashed border-blue-200 bg-blue-50/30 hover:bg-blue-50/70 py-1.5 text-[10px] font-semibold text-blue-600 transition-colors cursor-pointer"
+                  className="flex justify-center items-center rounded-lg border border-dashed border-blue-600/20 dark:border-blue-500/30 bg-blue-50/10 dark:bg-blue-950/10 hover:bg-blue-50/20 dark:hover:bg-blue-950/25 py-1.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 transition-colors cursor-pointer"
                 >
                   Employee
                 </button>

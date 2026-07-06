@@ -110,13 +110,13 @@ export const ProductsPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-white border border-red-100 rounded-xl text-center space-y-4 shadow-xs">
-        <div className="p-3 bg-red-50 text-red-600 rounded-full">
+      <div className="flex flex-col items-center justify-center p-8 bg-card border border-red-100 dark:border-red-950/30 rounded-xl text-center space-y-4 shadow-xs text-foreground">
+        <div className="p-3 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-full">
           <AlertTriangle className="h-8 w-8" />
         </div>
         <div className="space-y-1">
-          <h3 className="text-base font-semibold text-slate-800">Failed to Load Products</h3>
-          <p className="text-xs text-slate-500">
+          <h3 className="text-base font-semibold text-foreground">Failed to Load Products</h3>
+          <p className="text-xs text-muted-foreground">
             There was a problem communicating with the server.
           </p>
         </div>
@@ -138,7 +138,7 @@ export const ProductsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-page-entrance">
+    <div className="space-y-6 animate-page-entrance text-foreground">
       <PageHeader
         title="Products Inventory"
         description="Search, view, update, and manage product inventory stocks and prices."
@@ -170,11 +170,11 @@ export const ProductsPage: React.FC = () => {
       {products.length > 0 ? (
         <div className="space-y-4">
           {/* Desktop/Tablet Table View */}
-          <div className="hidden md:block overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="hidden md:block overflow-hidden rounded-xl border border-border bg-card">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  <tr className="border-b border-border bg-muted/50 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     <th className="px-6 py-4 w-20">Image</th>
                     <th className="px-6 py-4">Product Name</th>
                     <th className="px-6 py-4">SKU</th>
@@ -185,18 +185,20 @@ export const ProductsPage: React.FC = () => {
                     {hasActions && <th className="px-6 py-4 text-right w-28">Actions</th>}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+                <tbody className="divide-y divide-border/50 text-sm text-foreground">
                   {products.map((product) => (
-                    <tr key={product._id} className="hover:bg-slate-50/50 transition-colors">
+                    <tr key={product._id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-6 py-4">
                         <img
                           src={getProductImageUrl(product.image)}
                           alt={product.name}
-                          className="h-10 w-10 rounded-lg object-cover border border-slate-200 bg-slate-50"
+                          className="h-10 w-10 rounded-lg object-cover border border-border bg-muted"
                         />
                       </td>
-                      <td className="px-6 py-4 font-medium text-slate-900">{product.name}</td>
-                      <td className="px-6 py-4 font-mono text-xs">{product.sku}</td>
+                      <td className="px-6 py-4 font-medium text-foreground">{product.name}</td>
+                      <td className="px-6 py-4 font-mono text-xs text-muted-foreground">
+                        {product.sku}
+                      </td>
                       <td className="px-6 py-4">{product.category}</td>
                       <td className="px-6 py-4">{formatCurrency(product.purchasePrice)}</td>
                       <td className="px-6 py-4">{formatCurrency(product.sellingPrice)}</td>
@@ -210,7 +212,7 @@ export const ProductsPage: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => handleEdit(product)}
-                                className="p-1 text-slate-500 hover:text-blue-600 hover:bg-slate-50 rounded"
+                                className="p-1 text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 hover:bg-muted rounded"
                                 title="Edit"
                               >
                                 <Edit2 className="h-4 w-4" />
@@ -220,7 +222,7 @@ export const ProductsPage: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => handleDeletePrompt(product)}
-                                className="p-1 text-slate-500 hover:text-red-600 hover:bg-slate-50 rounded"
+                                className="p-1 text-muted-foreground hover:text-red-600 dark:hover:text-red-400 hover:bg-muted rounded"
                                 title="Delete"
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -249,36 +251,36 @@ export const ProductsPage: React.FC = () => {
               {products.map((product) => (
                 <div
                   key={product._id}
-                  className="rounded-xl border border-slate-200 bg-white p-5 space-y-4 shadow-xs"
+                  className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-xs text-foreground"
                 >
                   <div className="flex gap-4">
                     <img
                       src={getProductImageUrl(product.image)}
                       alt={product.name}
-                      className="h-16 w-16 rounded-lg object-cover border border-slate-200 bg-slate-50 flex-shrink-0"
+                      className="h-16 w-16 rounded-lg object-cover border border-border bg-muted flex-shrink-0"
                     />
                     <div className="space-y-1">
-                      <h4 className="font-semibold text-slate-900 text-base">{product.name}</h4>
-                      <p className="text-xs font-mono text-slate-500">SKU: {product.sku}</p>
-                      <p className="text-xs text-slate-500">Category: {product.category}</p>
+                      <h4 className="font-semibold text-foreground text-base">{product.name}</h4>
+                      <p className="text-xs font-mono text-muted-foreground">SKU: {product.sku}</p>
+                      <p className="text-xs text-muted-foreground">Category: {product.category}</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 text-xs">
+                  <div className="grid grid-cols-3 gap-2 py-3 border-y border-border text-xs">
                     <div>
-                      <span className="text-slate-500 block">Buy Price</span>
-                      <span className="font-medium text-slate-800">
+                      <span className="text-muted-foreground block">Buy Price</span>
+                      <span className="font-medium text-foreground">
                         {formatCurrency(product.purchasePrice)}
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block">Sell Price</span>
-                      <span className="font-medium text-slate-800">
+                      <span className="text-muted-foreground block">Sell Price</span>
+                      <span className="font-medium text-foreground">
                         {formatCurrency(product.sellingPrice)}
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block">Status</span>
+                      <span className="text-muted-foreground block">Status</span>
                       <span className="block mt-0.5">
                         <StatusBadge quantity={product.stockQuantity} />
                       </span>
@@ -291,7 +293,7 @@ export const ProductsPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleEdit(product)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-border rounded-lg text-foreground hover:bg-muted"
                         >
                           <Edit2 className="h-3.5 w-3.5" />
                           Edit
@@ -301,7 +303,7 @@ export const ProductsPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleDeletePrompt(product)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-red-100 text-red-700 hover:bg-red-50 rounded-lg"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-red-200 dark:border-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-500/10 rounded-lg"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Delete
@@ -312,7 +314,7 @@ export const ProductsPage: React.FC = () => {
                 </div>
               ))}
             </div>
-            <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
+            <div className="rounded-xl border border-border overflow-hidden bg-card">
               <Pagination
                 page={page}
                 limit={limit}
@@ -324,10 +326,10 @@ export const ProductsPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl p-8 border border-slate-200 text-center shadow-xs">
-          <Package className="h-10 w-10 mx-auto text-slate-400 mb-3" />
-          <h3 className="text-base font-semibold text-slate-800">No products found</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+        <div className="bg-card rounded-xl p-8 border border-border text-center shadow-xs text-foreground">
+          <Package className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+          <h3 className="text-base font-semibold text-foreground">No products found</h3>
+          <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
             Try adjusting your search criteria or add new items to the inventory.
           </p>
         </div>

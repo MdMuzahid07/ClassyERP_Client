@@ -108,7 +108,7 @@ export const CreateSalePage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 animate-page-entrance">
+    <div className="space-y-6 animate-page-entrance text-foreground">
       <PageHeader
         title="Create Sale"
         description="Launch a new sale transaction and adjust catalog stock levels atomically."
@@ -117,11 +117,11 @@ export const CreateSalePage: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-6">
+          <div className="bg-card border border-border rounded-xl p-6 shadow-xs space-y-6 text-foreground">
             <div>
               <label
                 htmlFor="customer"
-                className="block text-sm font-semibold text-slate-700 mb-1.5"
+                className="block text-sm font-semibold text-foreground mb-1.5"
               >
                 Customer Name
               </label>
@@ -129,8 +129,8 @@ export const CreateSalePage: React.FC = () => {
                 id="customer"
                 type="text"
                 {...register('customer')}
-                className={`block w-full rounded-lg border px-3.5 py-2.5 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors ${
-                  errors.customer ? 'border-red-300 focus:border-red-500' : 'border-slate-300'
+                className={`block w-full rounded-lg border px-3.5 py-2.5 text-sm placeholder-muted-foreground bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors ${
+                  errors.customer ? 'border-red-300 focus:border-red-500' : 'border-border'
                 }`}
                 placeholder="Enter customer name..."
               />
@@ -139,13 +139,13 @@ export const CreateSalePage: React.FC = () => {
               )}
             </div>
 
-            <div className="border-t border-slate-100 pt-6">
+            <div className="border-t border-border pt-6">
               <div className="flex justify-between items-center mb-4">
-                <h4 className="text-sm font-bold text-slate-800">Order Items</h4>
+                <h4 className="text-sm font-bold text-foreground">Order Items</h4>
                 <button
                   type="button"
                   onClick={() => append({ product: '', quantity: 1 })}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-dashed border-blue-200 hover:border-blue-300"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors border border-dashed border-blue-200 dark:border-blue-800"
                 >
                   <Plus className="h-4 w-4" />
                   Add Item
@@ -184,7 +184,7 @@ export const CreateSalePage: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting || !isValid}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white rounded-xl bg-blue-600 hover:bg-blue-700 shadow-xs focus:outline-none disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white rounded-xl bg-blue-600 hover:bg-blue-700 shadow-xs focus:outline-none disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {isSubmitting ? (
               <>

@@ -45,13 +45,15 @@ export const DashboardPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-white border border-red-100 rounded-xl text-center space-y-4 shadow-xs">
-        <div className="p-3 bg-red-50 text-red-600 rounded-full">
+      <div className="flex flex-col items-center justify-center p-8 bg-card border border-red-100 dark:border-red-950/30 rounded-xl text-center space-y-4 shadow-xs text-foreground">
+        <div className="p-3 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-full">
           <AlertTriangle className="h-8 w-8" />
         </div>
         <div className="space-y-1">
-          <h3 className="text-base font-semibold text-slate-800">Failed to Load Dashboard Stats</h3>
-          <p className="text-xs text-slate-500">
+          <h3 className="text-base font-semibold text-foreground">
+            Failed to Load Dashboard Stats
+          </h3>
+          <p className="text-xs text-muted-foreground">
             There was a problem communicating with the server.
           </p>
         </div>
@@ -77,28 +79,32 @@ export const DashboardPage: React.FC = () => {
           title="Total Products"
           value={totalProducts}
           icon={Package}
-          iconColor="text-blue-600"
-          iconBg="bg-blue-50"
+          iconColor="text-blue-600 dark:text-blue-400"
+          iconBg="bg-blue-50 dark:bg-blue-950/20"
         />
         <StatCard
           title="Total Sales"
           value={totalSales}
           icon={ShoppingCart}
-          iconColor="text-emerald-600"
-          iconBg="bg-emerald-50"
+          iconColor="text-emerald-600 dark:text-emerald-400"
+          iconBg="bg-emerald-50 dark:bg-emerald-950/20"
         />
         <StatCard
           title="Low Stock Alert"
           value={lowStockProducts.length}
           icon={AlertTriangle}
-          iconColor={lowStockProducts.length > 0 ? 'text-amber-600' : 'text-slate-400'}
-          iconBg={lowStockProducts.length > 0 ? 'bg-amber-50' : 'bg-slate-50'}
+          iconColor={
+            lowStockProducts.length > 0
+              ? 'text-amber-600 dark:text-amber-400'
+              : 'text-muted-foreground'
+          }
+          iconBg={lowStockProducts.length > 0 ? 'bg-amber-50 dark:bg-amber-950/20' : 'bg-muted'}
         />
       </div>
 
       {/* Low Stock Alert Section */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-slate-800 tracking-tight">Low Stock Alerts</h2>
+        <h2 className="text-lg font-bold text-foreground tracking-tight">Low Stock Alerts</h2>
         {lowStockProducts.length > 0 ? (
           <LowStockTable products={lowStockProducts} />
         ) : (
@@ -106,8 +112,8 @@ export const DashboardPage: React.FC = () => {
             title="All items healthy"
             description="No low stock products found. Your current inventory levels are healthy."
             icon={CheckCircle}
-            iconColor="text-emerald-600"
-            iconBg="bg-emerald-50"
+            iconColor="text-emerald-600 dark:text-emerald-400"
+            iconBg="bg-emerald-50 dark:bg-emerald-950/20"
           />
         )}
       </div>

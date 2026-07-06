@@ -1,26 +1,28 @@
-<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle
-    cx="50"
-    cy="50"
-    r="38"
-    stroke="#0F62FE"
-    strokeWidth="11"
-    strokeLinecap="round"
-    strokeDasharray="170 50"
-    transform="rotate(-40 50 50)"
-  />
-  <path
-    d="M26 62 L42 46 L58 56 L74 30"
-    stroke="#0F62FE"
-    strokeWidth="11"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
-  <path
-    d="M62 30 H74 V42"
-    stroke="#0F62FE"
-    strokeWidth="11"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" width="100%" height="100%">
+  <defs>
+    <!-- Perfected Gradient matching our brand primary blue transition -->
+    <linearGradient id="classyGrad" x1="10%" y1="90%" x2="90%" y2="10%">
+      <stop offset="0%" stop-color="#0f62fe"/>
+      <stop offset="60%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </linearGradient>
+  </defs>
+
+  <g fill="url(#classyGrad)">
+    <!-- Outer Ring with precise cuts -->
+    <path d="M110,10 A100,100 0 1,0 205,140 L180,132 A75,75 0 1,1 110,35 Z" />
+    
+    <!-- Inner Ring -->
+    <path d="M110,50 A60,60 0 0,0 60,145 L78,130 A40,40 0 0,1 110,70 Z" />
+    
+    <!-- Central Zig-Zag Growth Arrow & Horizontal Bars -->
+    <path d="M 15,195 L 90,110 L 125,145 L 180,65 L 165,55 L 210,25 L 195,85 L 180,75 L 125,165 L 90,135 L 35,200 Z" />
+    
+    <!-- Inner Triangle Fill -->
+    <polygon points="90,165 105,145 120,165" />
+    
+    <!-- Right side horizontal bars matching the "E" shape -->
+    <rect x="135" y="95" width="60" height="22" rx="2" />
+    <rect x="120" y="125" width="75" height="22" rx="2" />
+  </g>
 </svg>

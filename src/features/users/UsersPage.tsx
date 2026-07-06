@@ -102,13 +102,13 @@ export const UsersPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-white border border-red-100 rounded-xl text-center space-y-4 shadow-xs">
-        <div className="p-3 bg-red-50 text-red-600 rounded-full">
+      <div className="flex flex-col items-center justify-center p-8 bg-card border border-red-100 dark:border-red-950/30 rounded-xl text-center space-y-4 shadow-xs text-foreground">
+        <div className="p-3 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-full">
           <AlertTriangle className="h-8 w-8" />
         </div>
         <div className="space-y-1">
-          <h3 className="text-base font-semibold text-slate-800">Failed to Load User Registry</h3>
-          <p className="text-xs text-slate-500">
+          <h3 className="text-base font-semibold text-foreground">Failed to Load User Registry</h3>
+          <p className="text-xs text-muted-foreground">
             There was a problem communicating with the server.
           </p>
         </div>
@@ -130,7 +130,7 @@ export const UsersPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-page-entrance">
+    <div className="space-y-6 animate-page-entrance text-foreground">
       <PageHeader
         title="User Management"
         description="Admin panel to add staff, manage roles, and toggle account activation states."
@@ -159,11 +159,11 @@ export const UsersPage: React.FC = () => {
       {users.length > 0 ? (
         <div className="space-y-4">
           {/* Desktop/Tablet Table */}
-          <div className="hidden md:block overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="hidden md:block overflow-hidden rounded-xl border border-border bg-card">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  <tr className="border-b border-border bg-muted/50 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     <th className="px-6 py-4">Name</th>
                     <th className="px-6 py-4">Email Address</th>
                     <th className="px-6 py-4">Role</th>
@@ -171,21 +171,21 @@ export const UsersPage: React.FC = () => {
                     <th className="px-6 py-4 text-right w-36">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+                <tbody className="divide-y divide-border/50 text-sm text-foreground">
                   {users.map((user) => {
                     const isSelf = user._id === currentUser?._id;
 
                     return (
-                      <tr key={user._id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-slate-900">
+                      <tr key={user._id} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-6 py-4 font-medium text-foreground">
                           {user.name}{' '}
                           {isSelf && (
-                            <span className="text-[10px] text-blue-500 font-bold bg-blue-50 px-1.5 py-0.5 rounded ml-1">
+                            <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/20 px-1.5 py-0.5 rounded ml-1">
                               (You)
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-slate-600">{user.email}</td>
+                        <td className="px-6 py-4 text-muted-foreground">{user.email}</td>
                         <td className="px-6 py-4">
                           <RoleBadge role={user.role} />
                         </td>
@@ -193,8 +193,8 @@ export const UsersPage: React.FC = () => {
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
                               user.isActive
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                : 'bg-red-50 text-red-700 border-red-200'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50'
+                                : 'bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/50'
                             }`}
                           >
                             {user.isActive ? 'Active' : 'Inactive'}
@@ -207,12 +207,12 @@ export const UsersPage: React.FC = () => {
                               type="button"
                               onClick={() => handleToggleStatus(user)}
                               disabled={isSelf || isUpdating}
-                              className={`p-1.5 rounded transition-colors ${
+                              className={`p-1.5 rounded transition-colors cursor-pointer ${
                                 isSelf
-                                  ? 'text-slate-200 cursor-not-allowed'
+                                  ? 'text-muted-foreground/35 cursor-not-allowed'
                                   : user.isActive
-                                    ? 'text-emerald-600 hover:bg-emerald-50'
-                                    : 'text-slate-400 hover:bg-slate-50'
+                                    ? 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10'
+                                    : 'text-muted-foreground hover:bg-muted'
                               }`}
                               title={
                                 isSelf
@@ -234,7 +234,7 @@ export const UsersPage: React.FC = () => {
                               type="button"
                               onClick={() => handleEdit(user)}
                               disabled={isUpdating}
-                              className="p-1 text-slate-500 hover:text-blue-600 hover:bg-slate-50 rounded"
+                              className="p-1 text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 hover:bg-muted rounded cursor-pointer"
                               title="Edit Details"
                             >
                               <Edit2 className="h-4.5 w-4.5" />
@@ -245,10 +245,10 @@ export const UsersPage: React.FC = () => {
                               type="button"
                               onClick={() => handleDeletePrompt(user)}
                               disabled={isSelf || isDeleting}
-                              className={`p-1 rounded ${
+                              className={`p-1 rounded cursor-pointer ${
                                 isSelf
-                                  ? 'text-slate-200 cursor-not-allowed'
-                                  : 'text-slate-500 hover:text-red-600 hover:bg-slate-50'
+                                  ? 'text-muted-foreground/35 cursor-not-allowed'
+                                  : 'text-muted-foreground hover:text-red-600 dark:hover:text-red-400 hover:bg-muted'
                               }`}
                               title={isSelf ? "You can't delete yourself" : 'Delete Account'}
                             >
@@ -280,31 +280,31 @@ export const UsersPage: React.FC = () => {
                 return (
                   <div
                     key={user._id}
-                    className="rounded-xl border border-slate-200 bg-white p-5 space-y-4 shadow-xs"
+                    className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-xs text-foreground"
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-semibold text-slate-900 text-base">
+                        <h4 className="font-semibold text-foreground text-base">
                           {user.name}{' '}
                           {isSelf && (
-                            <span className="text-[10px] text-blue-500 font-bold bg-blue-50 px-1.5 py-0.5 rounded ml-1">
+                            <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/20 px-1.5 py-0.5 rounded ml-1">
                               (You)
                             </span>
                           )}
                         </h4>
-                        <p className="text-xs text-slate-500 mt-0.5">{user.email}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{user.email}</p>
                       </div>
                       <RoleBadge role={user.role} />
                     </div>
 
-                    <div className="flex justify-between items-center pt-3 border-t border-slate-100 text-xs">
+                    <div className="flex justify-between items-center pt-3 border-t border-border text-xs">
                       <div>
-                        <span className="text-slate-500 block">Status</span>
+                        <span className="text-muted-foreground block text-xs">Status</span>
                         <span
                           className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${
                             user.isActive
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-red-50 text-red-700 border-red-200'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50'
+                              : 'bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/50'
                           }`}
                         >
                           {user.isActive ? 'Active' : 'Inactive'}
@@ -317,12 +317,12 @@ export const UsersPage: React.FC = () => {
                           type="button"
                           onClick={() => handleToggleStatus(user)}
                           disabled={isSelf || isUpdating}
-                          className={`p-1.5 rounded ${
+                          className={`p-1.5 rounded cursor-pointer ${
                             isSelf
-                              ? 'text-slate-200 cursor-not-allowed'
+                              ? 'text-muted-foreground/35 cursor-not-allowed'
                               : user.isActive
-                                ? 'text-emerald-600'
-                                : 'text-slate-400'
+                                ? 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10'
+                                : 'text-muted-foreground hover:bg-muted'
                           }`}
                         >
                           {user.isActive ? (
@@ -336,7 +336,7 @@ export const UsersPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleEdit(user)}
-                          className="p-1 text-slate-500 hover:text-blue-600 rounded border border-slate-100"
+                          className="p-1 text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 rounded border border-border hover:bg-muted cursor-pointer"
                         >
                           <Edit2 className="h-4.5 w-4.5" />
                         </button>
@@ -346,10 +346,10 @@ export const UsersPage: React.FC = () => {
                           type="button"
                           disabled={isSelf}
                           onClick={() => handleDeletePrompt(user)}
-                          className={`p-1 rounded border border-slate-100 ${
+                          className={`p-1 rounded border border-border hover:bg-muted cursor-pointer ${
                             isSelf
-                              ? 'text-slate-200 cursor-not-allowed'
-                              : 'text-slate-500 hover:text-red-600'
+                              ? 'text-muted-foreground/35 cursor-not-allowed'
+                              : 'text-muted-foreground hover:text-red-600'
                           }`}
                         >
                           <Trash2 className="h-4.5 w-4.5" />
@@ -360,7 +360,7 @@ export const UsersPage: React.FC = () => {
                 );
               })}
             </div>
-            <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
+            <div className="rounded-xl border border-border overflow-hidden bg-card">
               <Pagination
                 page={page}
                 limit={limit}
@@ -372,10 +372,10 @@ export const UsersPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl p-8 border border-slate-200 text-center shadow-xs">
-          <UserX className="h-10 w-10 mx-auto text-slate-400 mb-3" />
-          <h3 className="text-base font-semibold text-slate-800">No users registered</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+        <div className="bg-card rounded-xl p-8 border border-border text-center shadow-xs text-foreground">
+          <UserX className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+          <h3 className="text-base font-semibold text-foreground">No users registered</h3>
+          <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
             Try adjusting your search query or add a new staff account above.
           </p>
         </div>

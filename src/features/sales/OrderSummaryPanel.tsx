@@ -28,59 +28,61 @@ export const OrderSummaryPanel: React.FC<OrderSummaryPanelProps> = ({
   const grandTotal = selectedItemsDetails.reduce((sum, current) => sum + current.subtotal, 0);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-6 lg:sticky lg:top-20">
-      <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-        <ShoppingCart className="h-5 w-5 text-blue-600" />
-        <h3 className="text-base font-bold text-slate-800">Order Summary</h3>
+    <div className="bg-card border border-border rounded-xl p-6 shadow-xs space-y-6 lg:sticky lg:top-20 text-foreground">
+      <div className="flex items-center gap-2 border-b border-border pb-4">
+        <ShoppingCart className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+        <h3 className="text-base font-bold text-foreground">Order Summary</h3>
       </div>
 
       <div className="space-y-1">
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Customer
         </span>
-        <p className="text-sm font-medium text-slate-800 truncate">
+        <p className="text-sm font-medium text-foreground truncate">
           {customer ? (
             customer
           ) : (
-            <span className="text-slate-400 italic">No customer specified</span>
+            <span className="text-muted-foreground italic">No customer specified</span>
           )}
         </p>
       </div>
 
       <div className="space-y-3">
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
           Items List
         </span>
         {selectedItemsDetails.length > 0 ? (
-          <div className="divide-y divide-slate-100 max-h-52 overflow-y-auto pr-1">
+          <div className="divide-y divide-border/50 max-h-52 overflow-y-auto pr-1">
             {selectedItemsDetails.map((detail, index) => (
               <div
                 key={`${detail.product?._id}-${index}`}
                 className="flex justify-between py-2.5 text-xs"
               >
                 <div className="truncate pr-2">
-                  <span className="font-semibold text-slate-800 block truncate">
+                  <span className="font-semibold text-foreground block truncate">
                     {detail.product?.name}
                   </span>
-                  <span className="text-slate-400 block mt-0.5">
+                  <span className="text-muted-foreground block mt-0.5">
                     {detail.quantity} x {formatCurrency(detail.product?.sellingPrice ?? 0)}
                   </span>
                 </div>
-                <span className="font-bold text-slate-700 whitespace-nowrap">
+                <span className="font-bold text-foreground whitespace-nowrap">
                   {formatCurrency(detail.subtotal)}
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-slate-400 text-xs italic py-4">No items added to sale yet.</p>
+          <p className="text-muted-foreground text-xs italic py-4">No items added to sale yet.</p>
         )}
       </div>
 
-      <div className="border-t border-slate-100 pt-4 space-y-3">
+      <div className="border-t border-border pt-4 space-y-3">
         <div className="flex justify-between items-baseline">
-          <span className="text-sm font-semibold text-slate-800">Grand Total</span>
-          <span className="text-xl font-extrabold text-blue-600">{formatCurrency(grandTotal)}</span>
+          <span className="text-sm font-semibold text-foreground">Grand Total</span>
+          <span className="text-xl font-extrabold text-blue-600 dark:text-blue-400">
+            {formatCurrency(grandTotal)}
+          </span>
         </div>
       </div>
     </div>

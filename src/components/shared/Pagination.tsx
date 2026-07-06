@@ -22,10 +22,10 @@ export const Pagination: React.FC<PaginationProps> = ({
   const endItem = Math.min(page * limit, total);
 
   return (
-    <div className="flex items-center justify-between border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
+    <div className="flex items-center justify-between border-t border-border bg-card px-4 py-4 sm:px-6">
       <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs text-slate-700">
+          <p className="text-xs text-muted-foreground">
             Showing <span className="font-medium">{startItem}</span> to{' '}
             <span className="font-medium">{endItem}</span> of{' '}
             <span className="font-medium">{total}</span> results
@@ -38,7 +38,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className="relative inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="relative inline-flex items-center rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
           Previous
@@ -47,7 +47,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           disabled={page >= totalPage}
           onClick={() => onPageChange(page + 1)}
-          className="relative inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="relative inline-flex items-center rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Next
           <ChevronRight className="h-4 w-4 ml-1" />

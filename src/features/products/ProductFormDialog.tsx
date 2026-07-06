@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { type Product } from '../../types/product';
@@ -10,6 +10,11 @@ import {
 import { ImageUploadField } from '../../components/shared/ImageUploadField';
 import { X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { createPortal } from 'react-dom';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
@@ -57,7 +62,6 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
   const {
     register,
     handleSubmit,
-    control,
     reset,
     setError,
     formState: { errors },
@@ -90,6 +94,10 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
       }
     }
   }, [isOpen, product, reset]);
+
+  const handleImageChange = (file: File | null) => {
+    setImageFile(file);
+  };
 
   const onSubmit = async (data: ProductSchemaType) => {
     if (!isEdit && !imageFile) {
@@ -130,211 +138,221 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop overlay */}
-      <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs animate-backdrop-fade"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/50 animate-backdrop-fade" onClick={onClose} />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg rounded-xl bg-white border border-slate-200 shadow-xl flex flex-col max-h-[90vh] animate-modal-scale">
+      <div className="relative w-full max-w-lg rounded-xl bg-card border border-border shadow-xl flex flex-col max-h-[90vh] animate-modal-scale text-foreground">
         {/* Header */}
-        <div className="flex h-16 items-center justify-between px-6 border-b border-slate-100 flex-shrink-0">
-          <h3 className="text-lg font-bold text-slate-950">
+        <div className="flex h-16 items-center justify-between px-6 border-b border-border flex-shrink-0">
+          <h3 className="text-lg font-bold text-foreground">
             {isEdit ? 'Edit Product' : 'Add New Product'}
           </h3>
           <button
             type="button"
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-800"
+            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
             onClick={onClose}
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Scrollable Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Image Field */}
-          <Controller
-            name="image"
-            control={control}
-            render={({ field }) => (
-              <ImageUploadField
-                value={imageFile}
-                onChange={(file) => {
-                  setImageFile(file);
-                  field.onChange(file);
-                }}
-                error={errors.image?.message as string | undefined}
-              />
-            )}
-          />
+        {/* Form Container */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
+          {/* Scrollable Form Body */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-5">
+            {/* Image Upload Row */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-semibold text-foreground">Product Image</label>
+              <ImageUploadField onChange={handleImageChange} value={imageFile} />
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Name */}
-            <div className="sm:col-span-2">
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
+            {/* Product Name */}
+            <div className="space-y-1">
+              <label htmlFor="name" className="block text-xs font-semibold text-foreground">
                 Product Name
               </label>
-              <input
+              <Input
                 id="name"
                 type="text"
-                disabled={isLoading}
                 {...register('name')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
+                className={
                   errors.name
-                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
-                    : 'border-slate-200'
-                }`}
-                placeholder="NexCore Processor X1"
-              />
-              {errors.name && <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>}
-            </div>
-
-            {/* SKU */}
-            <div>
-              <label htmlFor="sku" className="block text-sm font-medium text-slate-700 mb-1">
-                SKU
-              </label>
-              <input
-                id="sku"
-                type="text"
+                    ? 'border-red-200 focus-visible:ring-red-600/5 focus-visible:border-red-500'
+                    : ''
+                }
+                placeholder="Eco-Friendly TPE Yoga Mat"
                 disabled={isLoading}
-                {...register('sku')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
-                  errors.sku
-                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
-                    : 'border-slate-200'
-                }`}
-                placeholder="CPU-NX-001"
               />
-              {errors.sku && <p className="text-xs text-red-600 mt-1">{errors.sku.message}</p>}
-            </div>
-
-            {/* Category */}
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-1">
-                Category
-              </label>
-              <input
-                id="category"
-                type="text"
-                disabled={isLoading}
-                {...register('category')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
-                  errors.category
-                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
-                    : 'border-slate-200'
-                }`}
-                placeholder="Hardware"
-              />
-              {errors.category && (
-                <p className="text-xs text-red-600 mt-1">{errors.category.message}</p>
+              {errors.name?.message && (
+                <p className="text-[10px] font-semibold text-red-600 mt-1">{errors.name.message}</p>
               )}
             </div>
 
-            {/* Purchase Price */}
-            <div>
-              <label
-                htmlFor="purchasePrice"
-                className="block text-sm font-medium text-slate-700 mb-1"
-              >
-                Purchase Price ($)
-              </label>
-              <input
-                id="purchasePrice"
-                type="number"
-                step="0.01"
-                disabled={isLoading}
-                {...register('purchasePrice')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
-                  errors.purchasePrice
-                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
-                    : 'border-slate-200'
-                }`}
-                placeholder="120.00"
-              />
-              {errors.purchasePrice && (
-                <p className="text-xs text-red-600 mt-1">{errors.purchasePrice.message}</p>
-              )}
+            {/* SKU and Category Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* SKU */}
+              <div className="space-y-1">
+                <label htmlFor="sku" className="block text-xs font-semibold text-foreground">
+                  SKU
+                </label>
+                <Input
+                  id="sku"
+                  type="text"
+                  {...register('sku')}
+                  className={
+                    errors.sku
+                      ? 'border-red-200 focus-visible:ring-red-600/5 focus-visible:border-red-500'
+                      : ''
+                  }
+                  placeholder="FITN-YOGA-01"
+                  disabled={isLoading}
+                />
+                {errors.sku?.message && (
+                  <p className="text-[10px] font-semibold text-red-600 mt-1">
+                    {errors.sku.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Category */}
+              <div className="space-y-1">
+                <label htmlFor="category" className="block text-xs font-semibold text-foreground">
+                  Category
+                </label>
+                <Input
+                  id="category"
+                  type="text"
+                  {...register('category')}
+                  className={
+                    errors.category
+                      ? 'border-red-200 focus-visible:ring-red-600/5 focus-visible:border-red-500'
+                      : ''
+                  }
+                  placeholder="Fitness"
+                  disabled={isLoading}
+                />
+                {errors.category?.message && (
+                  <p className="text-[10px] font-semibold text-red-600 mt-1">
+                    {errors.category.message}
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Selling Price */}
-            <div>
-              <label
-                htmlFor="sellingPrice"
-                className="block text-sm font-medium text-slate-700 mb-1"
-              >
-                Selling Price ($)
-              </label>
-              <input
-                id="sellingPrice"
-                type="number"
-                step="0.01"
-                disabled={isLoading}
-                {...register('sellingPrice')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
-                  errors.sellingPrice
-                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
-                    : 'border-slate-200'
-                }`}
-                placeholder="199.99"
-              />
-              {errors.sellingPrice && (
-                <p className="text-xs text-red-600 mt-1">{errors.sellingPrice.message}</p>
-              )}
+            {/* Pricing Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Purchase Price */}
+              <div className="space-y-1">
+                <label
+                  htmlFor="purchasePrice"
+                  className="block text-xs font-semibold text-foreground"
+                >
+                  Purchase Price ($)
+                </label>
+                <Input
+                  id="purchasePrice"
+                  type="number"
+                  step="0.01"
+                  {...register('purchasePrice')}
+                  className={
+                    errors.purchasePrice
+                      ? 'border-red-200 focus-visible:ring-red-600/5 focus-visible:border-red-500'
+                      : ''
+                  }
+                  placeholder="18"
+                  disabled={isLoading}
+                />
+                {errors.purchasePrice?.message && (
+                  <p className="text-[10px] font-semibold text-red-600 mt-1">
+                    {errors.purchasePrice.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Selling Price */}
+              <div className="space-y-1">
+                <label
+                  htmlFor="sellingPrice"
+                  className="block text-xs font-semibold text-foreground"
+                >
+                  Selling Price ($)
+                </label>
+                <Input
+                  id="sellingPrice"
+                  type="number"
+                  step="0.01"
+                  {...register('sellingPrice')}
+                  className={
+                    errors.sellingPrice
+                      ? 'border-red-200 focus-visible:ring-red-600/5 focus-visible:border-red-500'
+                      : ''
+                  }
+                  placeholder="35"
+                  disabled={isLoading}
+                />
+                {errors.sellingPrice?.message && (
+                  <p className="text-[10px] font-semibold text-red-600 mt-1">
+                    {errors.sellingPrice.message}
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Stock Quantity */}
-            <div className="sm:col-span-2">
+            {/* Initial Stock */}
+            <div className="space-y-1">
               <label
                 htmlFor="stockQuantity"
-                className="block text-sm font-medium text-slate-700 mb-1"
+                className="block text-xs font-semibold text-foreground"
               >
                 Initial Stock
               </label>
-              <input
+              <Input
                 id="stockQuantity"
                 type="number"
-                disabled={isLoading}
                 {...register('stockQuantity')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
+                className={
                   errors.stockQuantity
-                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
-                    : 'border-slate-200'
-                }`}
-                placeholder="100"
+                    ? 'border-red-200 focus-visible:ring-red-600/5 focus-visible:border-red-500'
+                    : ''
+                }
+                placeholder="28"
+                disabled={isLoading}
               />
-              {errors.stockQuantity && (
-                <p className="text-xs text-red-600 mt-1">{errors.stockQuantity.message}</p>
+              {errors.stockQuantity?.message && (
+                <p className="text-[10px] font-semibold text-red-600 mt-1">
+                  {errors.stockQuantity.message}
+                </p>
               )}
             </div>
           </div>
 
-          {/* Action buttons footer */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 flex-shrink-0">
-            <button
+          {/* Footer Actions */}
+          <div className="flex justify-end gap-3 px-6 py-4 border-t border-border flex-shrink-0 bg-muted/30">
+            <Button
               type="button"
+              variant="outline"
               disabled={isLoading}
               onClick={onClose}
-              className="px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-lg focus:outline-none transition-colors"
+              className="cursor-pointer"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isLoading || (!isEdit && !imageFile)}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white rounded-lg bg-blue-600 hover:bg-blue-700 shadow-xs focus:outline-none disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
+              className="cursor-pointer"
             >
               {isLoading && <Loader2 className="h-3 w-3 animate-spin" />}
               {isEdit ? 'Save Changes' : 'Create Product'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 export default ProductFormDialog;

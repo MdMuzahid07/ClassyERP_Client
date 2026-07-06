@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useGetSalesQuery } from '../../redux/features/sales/salesApi';
 import { getSocket } from '../../lib/socket';
 import { useAppDispatch } from '../../app/hooks';
@@ -11,6 +12,7 @@ import { type Sale } from '../../types/sale';
 import { SalesHistorySkeleton } from '../../skeleton/SalesHistorySkeleton';
 import { jsPDF } from 'jspdf';
 import { toast } from 'sonner';
+import { ClassyLogo } from '../../components/shared/ClassyLogo';
 
 interface SaleDetailsDialogProps {
   isOpen: boolean;
@@ -57,8 +59,7 @@ const SaleDetailsDialog: React.FC<SaleDetailsDialogProps> = ({ isOpen, onClose, 
           <style>
             @page { size: auto; margin: 15mm; }
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; margin: 0; padding: 0; font-size: 13px; }
-            .header { border-bottom: 2px solid #0f62fe; padding-bottom: 12px; margin-bottom: 15px; }
-            .title { font-size: 20px; font-weight: 800; color: #0f172a; tracking: -0.025em; line-height: 28px; }
+            .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #0f62fe; padding-bottom: 12px; margin-bottom: 15px; }
             .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9; }
             .meta-label { color: #64748b; font-weight: 500; }
             .meta-val { font-weight: 600; color: #334155; }
@@ -70,15 +71,27 @@ const SaleDetailsDialog: React.FC<SaleDetailsDialogProps> = ({ isOpen, onClose, 
         </head>
         <body>
           <div class="header">
-            <div style="float: left; margin-right: 10px; margin-top: 1px;">
-              <svg viewBox="0 0 100 100" style="height: 26px; width: 26px;" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="38" stroke="#0F62FE" stroke-width="11" stroke-linecap="round" stroke-dasharray="170 50" transform="rotate(-40 50 50)" />
-                <path d="M26 62 L42 46 L58 56 L74 30" stroke="#0F62FE" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M62 30 H74 V42" stroke="#0F62FE" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </div>
-            <div class="title">ClassyERP Transaction Invoice</div>
-            <div style="clear: both;"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 220" style="height: 34px; width: auto; fill: none;">
+              <defs>
+                <linearGradient id="classyGradFullPrint" x1="10%" y1="90%" x2="90%" y2="10%">
+                  <stop offset="0%" stop-color="#0f62fe" />
+                  <stop offset="60%" stop-color="#3b82f6" />
+                  <stop offset="100%" stop-color="#1d4ed8" />
+                </linearGradient>
+              </defs>
+              <g transform="translate(10, 10) scale(0.95)" fill="url(#classyGradFullPrint)">
+                <path d="M110,10 A100,100 0 1,0 205,140 L180,132 A75,75 0 1,1 110,35 Z" />
+                <path d="M110,50 A60,60 0 0,0 60,145 L78,130 A40,40 0 0,1 110,70 Z" />
+                <path d="M 15,195 L 90,110 L 125,145 L 180,65 L 165,55 L 210,25 L 195,85 L 180,75 L 125,165 L 90,135 L 35,200 Z" />
+                <polygon points="90,165 105,145 120,165" />
+                <rect x="135" y="95" width="60" height="22" rx="2" />
+                <rect x="120" y="125" width="75" height="22" rx="2" />
+              </g>
+              <text x="235" y="145" font-family="'Montserrat', 'Arial', sans-serif" font-weight="700" font-size="95" letter-spacing="-2">
+                <tspan fill="#0f172a">Classy</tspan><tspan fill="#0f62fe">ERP</tspan>
+              </text>
+            </svg>
+            <div style="font-size: 13px; font-weight: bold; color: #64748b;">Transaction Invoice Receipt</div>
           </div>
           <div class="meta-grid">
             <div><span class="meta-label">Customer:</span> <span class="meta-val">${sale.customer}</span></div>
@@ -118,242 +131,269 @@ const SaleDetailsDialog: React.FC<SaleDetailsDialogProps> = ({ isOpen, onClose, 
 
   const handleDownloadReceipt = () => {
     try {
-      const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-      });
+      const svgString = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 220" width="750" height="220">
+          <defs>
+            <linearGradient id="pdfGrad" x1="10%" y1="90%" x2="90%" y2="10%">
+              <stop offset="0%" stop-color="#0f62fe" />
+              <stop offset="60%" stop-color="#3b82f6" />
+              <stop offset="100%" stop-color="#1d4ed8" />
+            </linearGradient>
+          </defs>
+          <g transform="translate(10, 10) scale(0.95)" fill="url(#pdfGrad)">
+            <path d="M110,10 A100,100 0 1,0 205,140 L180,132 A75,75 0 1,1 110,35 Z" />
+            <path d="M110,50 A60,60 0 0,0 60,145 L78,130 A40,40 0 0,1 110,70 Z" />
+            <path d="M 15,195 L 90,110 L 125,145 L 180,65 L 165,55 L 210,25 L 195,85 L 180,75 L 125,165 L 90,135 L 35,200 Z" />
+            <polygon points="90,165 105,145 120,165" />
+            <rect x="135" y="95" width="60" height="22" rx="2" />
+            <rect x="120" y="125" width="75" height="22" rx="2" />
+          </g>
+          <text x="235" y="145" font-family="'Montserrat', 'Arial', sans-serif" font-weight="700" font-size="95" letter-spacing="-2">
+            <tspan fill="#0f172a">Classy</tspan><tspan fill="#0f62fe">ERP</tspan>
+          </text>
+        </svg>
+      `;
 
-      const primaryColor = '#0F62FE';
-      const textColor = '#1E293B';
-      const grayColor = '#64748B';
-      const lightGray = '#F8FAFC';
-      const borderLight = '#E2E8F0';
+      const img = new Image();
+      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 750;
+          canvas.height = 220;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) throw new Error('Canvas context not supported');
+          ctx.drawImage(img, 0, 0);
+          const imgData = canvas.toDataURL('image/png');
 
-      // Draw Vector Brand Logo Emblem (cx=26, cy=24, r=5.5)
-      doc.setDrawColor(primaryColor);
-      doc.setLineWidth(0.85);
-      doc.circle(26, 24, 5.5, 'S');
+          const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+          });
 
-      // Growth lines
-      doc.line(22.5, 27.5, 25, 24);
-      doc.line(25, 24, 27.5, 26);
-      doc.line(27.5, 26, 30.5, 21.5);
+          const primaryColor = '#0F62FE';
+          const textColor = '#1E293B';
+          const grayColor = '#64748B';
+          const lightGray = '#F8FAFC';
+          const borderLight = '#E2E8F0';
 
-      // Arrowhead
-      doc.line(28.5, 21.5, 30.5, 21.5);
-      doc.line(30.5, 21.5, 30.5, 23.5);
+          // Embed Vector ClassyERP Logo
+          doc.addImage(imgData, 'PNG', 20, 15, 34, 10);
 
-      // Header Brand Text (shifted right to fit logo)
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(20);
-      doc.setTextColor(textColor);
-      doc.text('ClassyERP Transaction Invoice', 35, 24);
+          // Header Text (shifted to match logo alignment)
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(14);
+          doc.setTextColor(textColor);
+          doc.text('Transaction Invoice Receipt', 190, 22, { align: 'right' });
 
-      doc.setFontSize(9.5);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(grayColor);
-      doc.text('Thank you for your transaction!', 35, 30);
+          doc.setFontSize(8.5);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(grayColor);
+          doc.text('Thank you for your transaction!', 190, 27, { align: 'right' });
 
-      // Accent divider line
-      doc.setDrawColor(primaryColor);
-      doc.setLineWidth(0.8);
-      doc.line(20, 36, 190, 36);
+          // Accent divider line
+          doc.setDrawColor(primaryColor);
+          doc.setLineWidth(0.8);
+          doc.line(20, 36, 190, 36);
 
-      // Details Metadata Card background
-      doc.setFillColor(lightGray);
-      doc.setDrawColor(borderLight);
-      doc.setLineWidth(0.25);
-      doc.roundedRect(20, 42, 170, 28, 3, 3, 'FD');
+          // Details Metadata Card background
+          doc.setFillColor(lightGray);
+          doc.setDrawColor(borderLight);
+          doc.setLineWidth(0.25);
+          doc.roundedRect(20, 42, 170, 28, 3, 3, 'FD');
 
-      doc.setFontSize(9);
-      doc.setTextColor(grayColor);
-      doc.text('Customer:', 25, 49);
-      doc.text('Sold By:', 25, 61);
-      doc.text('Date & Time:', 105, 49);
-      doc.text('Transaction ID:', 105, 61);
+          doc.setFontSize(9);
+          doc.setTextColor(grayColor);
+          doc.text('Customer:', 25, 49);
+          doc.text('Sold By:', 25, 61);
+          doc.text('Date & Time:', 105, 49);
+          doc.text('Transaction ID:', 105, 61);
 
-      doc.setTextColor(textColor);
-      doc.setFont('helvetica', 'bold');
-      doc.text(sale.customer, 43, 49);
-      doc.text(soldByName, 41, 61);
-      doc.text(new Date(sale.createdAt).toLocaleString(), 125, 49);
-      doc.setFont('courier', 'bold');
-      doc.setFontSize(8.5);
-      doc.text(sale._id, 131, 61);
+          doc.setTextColor(textColor);
+          doc.setFont('helvetica', 'bold');
+          doc.text(sale.customer, 43, 49);
+          doc.text(soldByName, 41, 61);
+          doc.text(new Date(sale.createdAt).toLocaleString(), 125, 49);
+          doc.setFont('courier', 'bold');
+          doc.setFontSize(8.5);
+          doc.text(sale._id, 131, 61);
 
-      // Table Header outline
-      let y = 80;
-      doc.setFillColor(lightGray);
-      doc.roundedRect(20, y, 170, 9, 1, 1, 'FD');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9.5);
-      doc.setTextColor(textColor);
-      doc.text('Product', 23, y + 6);
-      doc.text('Qty', 115, y + 6);
-      doc.text('Unit Price', 135, y + 6);
-      doc.text('Subtotal', 165, y + 6);
+          // Table Header outline
+          let y = 80;
+          doc.setFillColor(lightGray);
+          doc.roundedRect(20, y, 170, 9, 1, 1, 'FD');
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(9.5);
+          doc.setTextColor(textColor);
+          doc.text('Product', 23, y + 6);
+          doc.text('Qty', 115, y + 6);
+          doc.text('Unit Price', 135, y + 6);
+          doc.text('Subtotal', 165, y + 6);
 
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      y += 9;
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          y += 9;
 
-      sale.items.forEach((item) => {
-        doc.setDrawColor(borderLight);
-        doc.line(20, y + 8, 190, y + 8);
+          sale.items.forEach((item) => {
+            doc.setDrawColor(borderLight);
+            doc.line(20, y + 8, 190, y + 8);
 
-        doc.text(item.productName, 23, y + 5.5);
-        doc.text(String(item.quantity), 117, y + 5.5);
-        doc.text(`$${item.unitPrice.toFixed(2)}`, 135, y + 5.5);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`$${item.subtotal.toFixed(2)}`, 165, y + 5.5);
-        doc.setFont('helvetica', 'normal');
-        y += 8;
-      });
+            doc.text(item.productName, 23, y + 5.5);
+            doc.text(String(item.quantity), 117, y + 5.5);
+            doc.text(`$${item.unitPrice.toFixed(2)}`, 135, y + 5.5);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`$${item.subtotal.toFixed(2)}`, 165, y + 5.5);
+            doc.setFont('helvetica', 'normal');
+            y += 8;
+          });
 
-      // Subtotal summaries
-      y += 12;
-      doc.setFont('helvetica', 'normal');
-      doc.text('Total Items:', 130, y);
-      doc.setFont('helvetica', 'bold');
-      doc.text(String(sale.items.length), 175, y);
+          // Subtotal summaries
+          y += 12;
+          doc.setFont('helvetica', 'normal');
+          doc.text('Total Items:', 130, y);
+          doc.setFont('helvetica', 'bold');
+          doc.text(String(sale.items.length), 175, y);
 
-      y += 5;
-      doc.setDrawColor(borderLight);
-      doc.line(130, y, 190, y);
+          y += 5;
+          doc.setDrawColor(borderLight);
+          doc.line(130, y, 190, y);
 
-      y += 7;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10.5);
-      doc.text('Grand Total:', 130, y);
-      doc.setFontSize(12.5);
-      doc.setTextColor(primaryColor);
-      doc.text(`$${sale.grandTotal.toFixed(2)}`, 160, y);
+          y += 7;
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10.5);
+          doc.text('Grand Total:', 130, y);
+          doc.setFontSize(12.5);
+          doc.setTextColor(primaryColor);
+          doc.text(`$${sale.grandTotal.toFixed(2)}`, 160, y);
 
-      // System Signature
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(grayColor);
-      doc.text('ClassyERP Inc. - Inventory & Sales Management System', 62, 275);
-
-      doc.save(`ClassyERP-Receipt-${sale._id.slice(-6)}.pdf`);
-      toast.success('Invoice PDF downloaded successfully!');
+          doc.save(`ClassyERP-Receipt-${sale._id.slice(-6)}.pdf`);
+          toast.success('Invoice PDF downloaded successfully!');
+        } catch (err) {
+          console.error(err);
+          toast.error('Failed to generate PDF layout.');
+        }
+      };
     } catch {
-      toast.error('Failed to generate PDF invoice. Please ensure "jspdf" dependency is loaded.');
+      toast.error('Failed to initialize PDF downloader.');
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs animate-backdrop-fade"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/50 animate-backdrop-fade" onClick={onClose} />
 
       {/* Modal Container */}
       <div
         id="print-receipt-area"
-        className="relative w-full max-w-2xl rounded-xl bg-white border border-slate-200 shadow-xl flex flex-col max-h-[85vh] animate-modal-scale"
+        className="relative w-full max-w-2xl rounded-xl bg-card border border-border shadow-xl flex flex-col max-h-[85vh] animate-modal-scale text-foreground"
       >
         {/* Header */}
-        <div className="flex h-16 items-center justify-between px-6 border-b border-slate-100 flex-shrink-0 print:hidden">
-          <div className="flex items-center gap-2 text-slate-800">
-            <Receipt className="h-5 w-5 text-blue-600" />
-            <h3 className="text-lg font-bold text-slate-950">Sale Transaction Receipt</h3>
+        <div className="flex h-16 items-center justify-between px-6 border-b border-border flex-shrink-0 print:hidden">
+          <div className="flex items-center gap-2 text-foreground">
+            <Receipt className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <h3 className="text-lg font-bold text-foreground">Sale Transaction Receipt</h3>
           </div>
           <button
             type="button"
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-800"
+            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             onClick={onClose}
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Metadata Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
-            <div>
-              <span className="text-slate-400 block font-medium">Customer</span>
-              <span className="font-semibold text-slate-800 block mt-0.5 truncate">
-                {sale.customer}
-              </span>
+        {/* Receipt Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 print:p-0 print:overflow-visible">
+          {/* Logo Brand Banner */}
+          <div className="flex justify-between items-start border-b border-border pb-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <ClassyLogo className="h-7" />
+              </div>
+              <p className="text-[10px] text-muted-foreground">ClassyERP Inventory System</p>
             </div>
-            <div>
-              <span className="text-slate-400 block font-medium">Date & Time</span>
-              <span className="font-semibold text-slate-800 block mt-0.5">
-                {formatDate(sale.createdAt)}
+            <div className="text-right space-y-1">
+              <span className="inline-block px-2.5 py-1 text-[10px] font-bold rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-950/50">
+                Paid in Full
               </span>
-            </div>
-            <div>
-              <span className="text-slate-400 block font-medium">Sold By</span>
-              <span className="font-semibold text-slate-800 block mt-0.5 truncate">
-                {soldByName}
-              </span>
-            </div>
-            <div>
-              <span className="text-slate-400 block font-medium">Transaction ID</span>
-              <span className="font-mono text-slate-600 block mt-0.5 truncate">{sale._id}</span>
+              <p className="text-[10px] font-mono text-muted-foreground">TxId: {sale._id}</p>
             </div>
           </div>
 
-          {/* Items breakdown table */}
-          <div className="space-y-3">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-              Items List
-            </span>
-            <div className="overflow-hidden rounded-xl border border-slate-200">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 font-semibold text-slate-500 uppercase">
-                    <th className="px-4 py-3">Product</th>
-                    <th className="px-4 py-3 text-center">Quantity</th>
-                    <th className="px-4 py-3 text-right">Unit Price</th>
-                    <th className="px-4 py-3 text-right">Subtotal</th>
+          {/* Customer / Metadata */}
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-wider mb-1">
+                Billed To
+              </span>
+              <p className="font-semibold text-foreground">{sale.customer || 'Walk-in Customer'}</p>
+              <p className="text-muted-foreground text-[10px] mt-0.5">ClassyERP Account Member</p>
+            </div>
+            <div className="text-right">
+              <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-wider mb-1">
+                Transaction Date
+              </span>
+              <p className="font-semibold text-foreground">{formatDate(sale.createdAt)}</p>
+              <p className="text-muted-foreground text-[10px] mt-0.5">Status: Completed</p>
+            </div>
+          </div>
+
+          {/* Line Items Table */}
+          <div className="border border-border rounded-lg overflow-hidden">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-muted text-muted-foreground font-semibold border-b border-border">
+                  <th className="p-3">Product Item</th>
+                  <th className="p-3 text-center">Unit Price</th>
+                  <th className="p-3 text-center">Quantity</th>
+                  <th className="p-3 text-right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border bg-card">
+                {sale.items.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-muted/30 text-foreground">
+                    <td className="p-3 font-medium">{item.productName}</td>
+                    <td className="p-3 text-center font-mono">{formatCurrency(item.unitPrice)}</td>
+                    <td className="p-3 text-center font-semibold">{item.quantity}</td>
+                    <td className="p-3 text-right font-semibold font-mono">
+                      {formatCurrency(item.subtotal)}
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700">
-                  {sale.items.map((item, index) => (
-                    <tr key={index} className="hover:bg-slate-50/50">
-                      <td className="px-4 py-3 font-medium text-slate-900">{item.productName}</td>
-                      <td className="px-4 py-3 text-center">{item.quantity}</td>
-                      <td className="px-4 py-3 text-right">{formatCurrency(item.unitPrice)}</td>
-                      <td className="px-4 py-3 text-right font-semibold">
-                        {formatCurrency(item.subtotal)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          {/* Subtotals & Grand total summary */}
-          <div className="flex justify-end pt-4 border-t border-slate-100">
-            <div className="w-64 space-y-1.5 text-xs text-right">
-              <div className="flex justify-between items-baseline">
-                <span className="text-slate-500">Total Items:</span>
-                <span className="font-medium text-slate-800">{sale.items.length}</span>
-              </div>
-              <div className="flex justify-between items-baseline pt-2 border-t border-slate-100">
-                <span className="text-sm font-semibold text-slate-800">Grand Total:</span>
-                <span className="text-lg font-extrabold text-blue-600">
-                  {formatCurrency(sale.grandTotal)}
-                </span>
-              </div>
+          {/* Totals Summary */}
+          <div className="w-full max-w-[240px] ml-auto space-y-2 border-t border-border pt-4 text-xs">
+            <div className="flex justify-between text-muted-foreground">
+              <span>Items Subtotal:</span>
+              <span className="font-mono font-medium text-foreground">
+                {formatCurrency(sale.grandTotal)}
+              </span>
+            </div>
+            <div className="flex justify-between text-muted-foreground">
+              <span>Sales Tax (0%):</span>
+              <span className="font-mono font-medium text-foreground">$0.00</span>
+            </div>
+            <div className="flex justify-between border-t border-border pt-2 text-sm font-bold text-foreground">
+              <span>Grand Total:</span>
+              <span className="font-mono text-blue-600 dark:text-blue-400">
+                {formatCurrency(sale.grandTotal)}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-between items-center px-6 py-4 border-t border-slate-100 flex-shrink-0 print:hidden">
+        {/* Footer Actions */}
+        <div className="flex h-16 items-center justify-between px-6 border-t border-border bg-muted/30 flex-shrink-0 print:hidden">
           <div className="flex gap-2">
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted border border-border rounded-lg transition-colors cursor-pointer"
             >
               <Printer className="h-3.5 w-3.5" />
               Print Receipt
@@ -361,7 +401,7 @@ const SaleDetailsDialog: React.FC<SaleDetailsDialogProps> = ({ isOpen, onClose, 
             <button
               type="button"
               onClick={handleDownloadReceipt}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted border border-border rounded-lg transition-colors cursor-pointer"
             >
               <Download className="h-3.5 w-3.5" />
               Download PDF
@@ -370,13 +410,14 @@ const SaleDetailsDialog: React.FC<SaleDetailsDialogProps> = ({ isOpen, onClose, 
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted border border-border rounded-lg transition-colors cursor-pointer"
           >
             Close
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
@@ -417,13 +458,13 @@ export const SalesHistoryPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-white border border-red-100 rounded-xl text-center space-y-4 shadow-xs">
-        <div className="p-3 bg-red-50 text-red-600 rounded-full">
+      <div className="flex flex-col items-center justify-center p-8 bg-card border border-red-100 dark:border-red-950/30 rounded-xl text-center space-y-4 shadow-xs text-foreground">
+        <div className="p-3 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-full">
           <AlertTriangle className="h-8 w-8" />
         </div>
         <div className="space-y-1">
-          <h3 className="text-base font-semibold text-slate-800">Failed to Load Sales Ledger</h3>
-          <p className="text-xs text-slate-500">
+          <h3 className="text-base font-semibold text-foreground">Failed to Load Sales Ledger</h3>
+          <p className="text-xs text-muted-foreground">
             There was a problem communicating with the server.
           </p>
         </div>
@@ -445,7 +486,7 @@ export const SalesHistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-page-entrance">
+    <div className="space-y-6 animate-page-entrance text-foreground">
       <PageHeader
         title="Sales History"
         description="View past sales ledger logs, details breakdown, and transaction totals."
@@ -454,11 +495,11 @@ export const SalesHistoryPage: React.FC = () => {
       {sales.length > 0 ? (
         <div className="space-y-4">
           {/* Desktop/Tablet Table */}
-          <div className="hidden md:block overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="hidden md:block overflow-hidden rounded-xl border border-border bg-card">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  <tr className="border-b border-border bg-muted/50 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     <th className="px-6 py-4">Transaction Date</th>
                     <th className="px-6 py-4">Customer</th>
                     <th className="px-6 py-4">Items Summary</th>
@@ -467,7 +508,7 @@ export const SalesHistoryPage: React.FC = () => {
                     <th className="px-6 py-4 text-right w-24">Details</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+                <tbody className="divide-y divide-border/50 text-sm text-foreground">
                   {sales.map((sale) => {
                     const firstItem = sale.items[0]?.productName ?? 'Unknown Product';
                     const itemsSummary =
@@ -479,19 +520,21 @@ export const SalesHistoryPage: React.FC = () => {
                       <tr
                         key={sale._id}
                         onClick={() => handleOpenDetails(sale)}
-                        className="hover:bg-slate-50/50 transition-colors cursor-pointer"
+                        className="hover:bg-muted/30 transition-colors cursor-pointer"
                       >
-                        <td className="px-6 py-4 text-slate-500">{formatDate(sale.createdAt)}</td>
-                        <td className="px-6 py-4 font-semibold text-slate-900 truncate max-w-[150px]">
+                        <td className="px-6 py-4 text-muted-foreground">
+                          {formatDate(sale.createdAt)}
+                        </td>
+                        <td className="px-6 py-4 font-semibold text-foreground truncate max-w-[150px]">
                           {sale.customer}
                         </td>
-                        <td className="px-6 py-4 text-slate-600 truncate max-w-[220px]">
+                        <td className="px-6 py-4 text-muted-foreground truncate max-w-[220px]">
                           {itemsSummary}
                         </td>
-                        <td className="px-6 py-4 font-bold text-slate-900">
+                        <td className="px-6 py-4 font-bold text-foreground">
                           {formatCurrency(sale.grandTotal)}
                         </td>
-                        <td className="px-6 py-4 text-slate-600">{sellerName}</td>
+                        <td className="px-6 py-4 text-muted-foreground">{sellerName}</td>
                         <td className="px-6 py-4 text-right">
                           <button
                             type="button"
@@ -499,7 +542,7 @@ export const SalesHistoryPage: React.FC = () => {
                               e.stopPropagation();
                               handleOpenDetails(sale);
                             }}
-                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-colors"
+                            className="p-1.5 text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 hover:bg-muted rounded-lg transition-colors"
                           >
                             <Eye className="h-4.5 w-4.5" />
                           </button>
@@ -533,39 +576,39 @@ export const SalesHistoryPage: React.FC = () => {
                   <div
                     key={sale._id}
                     onClick={() => handleOpenDetails(sale)}
-                    className="rounded-xl border border-slate-200 bg-white p-5 space-y-4 shadow-xs cursor-pointer active:bg-slate-50/50 transition-colors"
+                    className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-xs cursor-pointer active:bg-muted/30 transition-colors text-foreground"
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-semibold text-slate-900 text-base">
+                        <h4 className="font-semibold text-foreground text-base">
                           Customer: {sale.customer}
                         </h4>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {formatDate(sale.createdAt)}
                         </p>
                       </div>
-                      <span className="text-sm font-extrabold text-blue-600">
+                      <span className="text-sm font-extrabold text-blue-600 dark:text-blue-400">
                         {formatCurrency(sale.grandTotal)}
                       </span>
                     </div>
 
-                    <div className="text-xs pt-3 border-t border-slate-100 space-y-1.5">
+                    <div className="text-xs pt-3 border-t border-border space-y-1.5">
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Items:</span>
-                        <span className="font-medium text-slate-700 truncate max-w-[200px]">
+                        <span className="text-muted-foreground">Items:</span>
+                        <span className="font-medium text-foreground truncate max-w-[200px]">
                           {itemsSummary}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Sold By:</span>
-                        <span className="font-medium text-slate-700">{sellerName}</span>
+                        <span className="text-muted-foreground">Sold By:</span>
+                        <span className="font-medium text-foreground">{sellerName}</span>
                       </div>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
+            <div className="rounded-xl border border-border overflow-hidden bg-card">
               <Pagination
                 page={page}
                 limit={limit}
@@ -577,10 +620,10 @@ export const SalesHistoryPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl p-8 border border-slate-200 text-center shadow-xs">
-          <Receipt className="h-10 w-10 mx-auto text-slate-400 mb-3" />
-          <h3 className="text-base font-semibold text-slate-800">No transactions recorded</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+        <div className="bg-card rounded-xl p-8 border border-border text-center shadow-xs text-foreground">
+          <Receipt className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+          <h3 className="text-base font-semibold text-foreground">No transactions recorded</h3>
+          <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
             Transactions will appear here once new sales are completed in the Create Sale terminal.
           </p>
         </div>

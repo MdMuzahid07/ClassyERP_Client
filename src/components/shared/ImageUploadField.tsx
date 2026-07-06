@@ -78,17 +78,17 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ value, onCha
 
   return (
     <div className="space-y-2">
-      <span className="block text-sm font-medium text-slate-700">Product Image</span>
+      <span className="block text-sm font-medium text-foreground">Product Image</span>
 
       <div
         className={`relative border-2 border-dashed rounded-xl transition-colors cursor-pointer ${
           preview
-            ? 'border-slate-200 bg-slate-50'
+            ? 'border-border bg-muted/30'
             : isDragActive
-              ? 'border-blue-500 bg-blue-50/50'
+              ? 'border-blue-500 bg-blue-500/10'
               : error
-                ? 'border-red-300 bg-red-50/10'
-                : 'border-slate-300 hover:border-blue-500 bg-white'
+                ? 'border-red-300 dark:border-red-900 bg-red-50/10'
+                : 'border-border hover:border-blue-500 bg-card text-foreground'
         }`}
         onDragEnter={handleDrag}
         onDragOver={handleDrag}
@@ -109,7 +109,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ value, onCha
             <img
               src={preview}
               alt="Preview"
-              className="max-h-36 rounded-lg object-contain border border-slate-200 bg-white"
+              className="max-h-36 rounded-lg object-contain border border-border bg-card"
             />
             <button
               type="button"
@@ -122,15 +122,15 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ value, onCha
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-8 px-4 text-center min-h-[160px] space-y-2">
-            <div className="p-3 rounded-full bg-slate-50 text-slate-400 hover:text-blue-500 transition-colors">
+            <div className="p-3 rounded-full bg-muted text-muted-foreground hover:text-blue-500 transition-colors">
               <Upload className="h-6 w-6" />
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-medium text-slate-700">
+              <p className="text-sm font-medium text-foreground">
                 Drag & drop an image, or{' '}
                 <span className="text-blue-600 hover:underline">browse</span>
               </p>
-              <p className="text-xs text-slate-500">Supports JPG, PNG, WEBP up to 5MB</p>
+              <p className="text-xs text-muted-foreground">Supports JPG, PNG, WEBP up to 5MB</p>
             </div>
           </div>
         )}

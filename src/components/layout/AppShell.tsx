@@ -1,31 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Outlet } from 'react-router';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
-import { MobileDrawer } from './MobileDrawer';
+import { SidebarProvider, SidebarInset } from '../ui/sidebar';
 
 export const AppShell: React.FC = () => {
-  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Desktop Sidebar (fixed left) */}
-      <Sidebar />
+    <SidebarProvider>
+      <div className="min-h-screen bg-background text-foreground flex w-full">
+        {/* Desktop & Mobile Sidebar from Shadcn */}
+        <Sidebar />
 
-      {/* Mobile Drawer (backdrop-overlay, slide-in) */}
-      <MobileDrawer isOpen={isMobileDrawerOpen} onClose={() => setIsMobileDrawerOpen(false)} />
+        {/* Main Content Frame */}
+        <SidebarInset className="flex flex-col min-h-screen flex-grow">
+          {/* Top Header */}
+          <Topbar />
 
-      {/* Main Content Frame */}
-      <div className="flex-1 flex flex-col lg:pl-64 min-h-screen">
-        {/* Top Header */}
-        <Topbar onMenuClick={() => setIsMobileDrawerOpen(true)} />
-
-        {/* Dynamic Inner Views */}
-        <main className="flex-1 p-4 md:p-6 lg:p-8 bg-slate-50 overflow-y-auto">
-          <Outlet />
-        </main>
+          {/* Dynamic Inner Views */}
+          <main className="flex-1 p-4 md:p-6 lg:p-8 bg-background text-foreground overflow-y-auto">
+            <Outlet />
+          </main>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 export default AppShell;
