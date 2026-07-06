@@ -4,8 +4,8 @@ import {
   type FetchArgs,
   type FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
-import { logout } from '../redux/features/auth/authSlice';
 import type { RootState } from '../app/store';
+import { logout } from '../redux/features/auth/authSlice';
 
 const baseUrl = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api/v1`
