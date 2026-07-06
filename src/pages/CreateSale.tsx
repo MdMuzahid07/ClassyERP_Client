@@ -1,9 +1,7 @@
 import React from 'react';
+import { CreateSalePage } from '../features/sales/CreateSalePage';
 
 export const CreateSale: React.FC = () => {
-  return (
-    <div>
-      <h1>Create Sale Page</h1>
-    </div>
-  );
+  return <CreateSalePage />;
 };
+export default CreateSale;

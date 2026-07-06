@@ -4,6 +4,8 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { logout } from '../../redux/features/auth/authSlice';
 import { useTheme } from '../../hooks/useTheme';
 
+import { ClassyLogo } from '../../components/shared/ClassyLogo';
+
 export const DashboardLayout: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
   const { theme, toggleTheme } = useTheme();
@@ -21,8 +23,7 @@ export const DashboardLayout: React.FC = () => {
       <aside className="w-full md:w-64 bg-card border-r border-border p-4 flex flex-col justify-between">
         <div>
           <div className="flex items-center space-x-2 mb-8">
-            <img src="/classy-logo.png" alt="ClassyERP Logo" className="h-8" />
-            <span className="font-bold text-lg">ClassyERP</span>
+            <ClassyLogo className="h-8" lightText={theme === 'dark'} />
           </div>
 
           <nav className="space-y-2">

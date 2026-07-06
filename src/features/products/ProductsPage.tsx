@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
-import { useAppSelector } from '../../app/hooks';
+import React, { useState, useEffect } from 'react';
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { hasPermission } from '../../lib/permissions';
-import { useGetProductsQuery, useDeleteProductMutation } from './productsApi';
+import {
+  useGetProductsQuery,
+  useDeleteProductMutation,
+  productsApi,
+} from '../../redux/features/products/productsApi';
+import { getSocket } from '../../lib/socket';
 import { PageHeader } from '../../components/shared/PageHeader';
 import { SearchInput } from '../../components/shared/SearchInput';
 import { Pagination } from '../../components/shared/Pagination';
@@ -12,18 +17,7 @@ import { formatCurrency } from '../../lib/utils';
 import { Plus, Edit2, Trash2, Package, RefreshCw, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { type Product } from '../../types/product';
-
-export const ProductsSkeleton: React.FC = () => {
-  return (
-    <div className="space-y-4 animate-pulse">
-      <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-        <div className="h-9 bg-slate-200 rounded w-48" />
-        <div className="h-9 bg-slate-200 rounded w-28" />
-      </div>
-      <div className="bg-white border border-slate-200 rounded-xl h-[400px]" />
-    </div>
-  );
-};
+import { ProductsSkeleton } from '../../skeleton/ProductsSkeleton';
 
 export const ProductsPage: React.FC = () => {
   const user = useAppSelector((state) => state.auth.user);
@@ -39,8 +33,31 @@ export const ProductsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const limit = 8;
 
+  const dispatch = useAppDispatch();
   const { data, isLoading, error, refetch } = useGetProductsQuery({ search, page, limit });
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleStockUpdated = (payload: { productId: string; stockQuantity: number }) => {
+      dispatch(
+        productsApi.util.updateQueryData('getProducts', { search, page, limit }, (draft) => {
+          const product = draft.products.find((p) => p._id === payload.productId);
+          if (product) {
+            product.stockQuantity = payload.stockQuantity;
+          }
+        })
+      );
+    };
+
+    socket.on('stockUpdated', handleStockUpdated);
+
+    return () => {
+      socket.off('stockUpdated', handleStockUpdated);
+    };
+  }, [dispatch, search, page, limit]);
 
   // Dialog States
   const [formOpen, setFormOpen] = useState(false);
@@ -121,7 +138,7 @@ export const ProductsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-entrance">
       <PageHeader
         title="Products Inventory"
         description="Search, view, update, and manage product inventory stocks and prices."

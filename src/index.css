@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @font-face {
   font-family: 'Inter';
@@ -21,51 +21,51 @@
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
+
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  
+
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  
+
   --color-tertiary: var(--tertiary);
   --color-neutral-bg: var(--neutral-bg);
-  
+
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-  
+
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  
+
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  
+
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, monospace;
 }
 
 @layer base {
   :root {
-    --background: #F4F7FB; /* Neutral base background from Nexus ERP */
+    --background: #f4f7fb; /* Neutral base background from Nexus ERP */
     --foreground: #08060d;
-    
-    --primary: #0F62FE; /* Primary brand from Nexus ERP */
+
+    --primary: #0f62fe; /* Primary brand from Nexus ERP */
     --primary-foreground: #ffffff;
-    
-    --secondary: #001D6C; /* Secondary brand from Nexus ERP */
+
+    --secondary: #001d6c; /* Secondary brand from Nexus ERP */
     --secondary-foreground: #ffffff;
-    
-    --tertiary: #D0E2FF; /* Tertiary brand from Nexus ERP */
-    --neutral-bg: #F4F7FB;
-    
+
+    --tertiary: #d0e2ff; /* Tertiary brand from Nexus ERP */
+    --neutral-bg: #f4f7fb;
+
     --card: #ffffff;
     --card-foreground: #08060d;
-    
+
     --border: #e5e4e7;
     --input: #e5e4e7;
-    --ring: #0F62FE;
-    
+    --ring: #0f62fe;
+
     --muted: #f4f3ec;
     --muted-foreground: #6b6375;
   }
@@ -73,23 +73,23 @@
   .dark {
     --background: #0d0e12;
     --foreground: #f3f4f6;
-    
-    --primary: #0F62FE;
+
+    --primary: #0f62fe;
     --primary-foreground: #ffffff;
-    
-    --secondary: #D0E2FF;
-    --secondary-foreground: #001D6C;
-    
-    --tertiary: #001D6C;
+
+    --secondary: #d0e2ff;
+    --secondary-foreground: #001d6c;
+
+    --tertiary: #001d6c;
     --neutral-bg: #16171d;
-    
+
     --card: #16171d;
     --card-foreground: #f3f4f6;
-    
+
     --border: #2e303a;
     --input: #2e303a;
-    --ring: #0F62FE;
-    
+    --ring: #0f62fe;
+
     --muted: #1f2028;
     --muted-foreground: #9ca3af;
   }
@@ -106,4 +106,69 @@ body {
 
 code {
   font-family: var(--font-mono);
+}
+
+/* --- Enterprise ERP Smooth Animations & Transition Keyframes --- */
+@keyframes pageEntrance {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backdropFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Animations Utilities */
+.animate-page-entrance {
+  animation: pageEntrance 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-backdrop-fade {
+  animation: backdropFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-modal-scale {
+  animation: modalScale 0.32s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+}
+
+/* Clean Print Styling for Sales Receipts */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #print-receipt-area,
+  #print-receipt-area * {
+    visibility: visible !important;
+  }
+  #print-receipt-area {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    padding: 20px !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
 }

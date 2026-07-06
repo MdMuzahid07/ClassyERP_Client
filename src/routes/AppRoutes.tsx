@@ -1,41 +1,34 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { AppShell } from '../components/layout/AppShell';
-import { LoginPage } from '../features/auth/LoginPage';
+import { Login } from '../pages/Login';
 import { ProtectedRoute } from '../features/auth/ProtectedRoute';
 import { RoleGuard } from '../features/auth/RoleGuard';
-import { DashboardPage } from '../features/dashboard/DashboardPage';
-import { ProductsPage } from '../features/products/ProductsPage';
-
-const CreateSalePlaceholder = () => (
-  <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs">
-    <h2 className="text-xl font-semibold mb-2">Create Sale</h2>
-    <p className="text-slate-600 text-sm">Create sale terminal will be configured in Phase 5.</p>
-  </div>
-);
-
-const SalesHistoryPlaceholder = () => (
-  <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs">
-    <h2 className="text-xl font-semibold mb-2">Sales History</h2>
-    <p className="text-slate-600 text-sm">Sales ledger history will be configured in Phase 6.</p>
-  </div>
-);
-
-const UsersPlaceholder = () => (
-  <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs">
-    <h2 className="text-xl font-semibold mb-2">User Management</h2>
-    <p className="text-slate-600 text-sm">
-      Administrative user tables will be configured in Phase 7.
-    </p>
-  </div>
-);
+import { Dashboard } from '../pages/Dashboard';
+import { Products } from '../pages/Products';
+import { CreateSale } from '../pages/CreateSale';
+import { SalesHistory } from '../pages/SalesHistory';
+import { Users } from '../pages/Users';
+import { NotFound } from '../pages/NotFound';
+import { useAppSelector } from '../app/hooks';
+import { connectSocket, disconnectSocket } from '../lib/socket';
 
 export const AppRoutes: React.FC = () => {
+  const token = useAppSelector((state) => state.auth.token);
+
+  React.useEffect(() => {
+    if (token) {
+      connectSocket(token);
+    } else {
+      disconnectSocket();
+    }
+  }, [token]);
+
   return (
     <BrowserRouter>
       <Routes>
         {/* Public Route */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<Login />} />
 
         {/* Protected Routing wrapper */}
         <Route
@@ -54,7 +47,7 @@ export const AppRoutes: React.FC = () => {
             path="dashboard"
             element={
               <RoleGuard requiredPermission="dashboard:read">
-                <DashboardPage />
+                <Dashboard />
               </RoleGuard>
             }
           />
@@ -63,7 +56,7 @@ export const AppRoutes: React.FC = () => {
             path="products"
             element={
               <RoleGuard requiredPermission="product:read">
-                <ProductsPage />
+                <Products />
               </RoleGuard>
             }
           />
@@ -72,7 +65,7 @@ export const AppRoutes: React.FC = () => {
             path="sales/create"
             element={
               <RoleGuard requiredPermission="sale:create">
-                <CreateSalePlaceholder />
+                <CreateSale />
               </RoleGuard>
             }
           />
@@ -81,7 +74,7 @@ export const AppRoutes: React.FC = () => {
             path="sales/history"
             element={
               <RoleGuard requiredPermission="sale:read">
-                <SalesHistoryPlaceholder />
+                <SalesHistory />
               </RoleGuard>
             }
           />
@@ -90,14 +83,14 @@ export const AppRoutes: React.FC = () => {
             path="users"
             element={
               <RoleGuard requiredPermission="user:manage">
-                <UsersPlaceholder />
+                <Users />
               </RoleGuard>
             }
           />
-        </Route>
 
-        {/* Wildcard redirects back to index */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Unmatched inside AppShell displays NotFound */}
+          <Route path="*" element={<NotFound />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -1,80 +1,100 @@
 import { baseApi } from '../../api/baseApi';
+import { type Product } from '../../../types/product';
 
-export interface Product {
-  _id: string;
-  name: string;
-  sku: string;
-  category: string;
-  purchasePrice: number;
-  sellingPrice: number;
-  stockQuantity: number;
-  productImage: string;
-  createdAt: string;
-  updatedAt: string;
+export interface ProductsQueryParams {
+  search?: string;
+  page?: number;
+  limit?: number;
 }
 
 export interface ProductsResponse {
   success: boolean;
-  data: {
-    products: Product[];
-    total: number;
+  message: string;
+  data: Product[];
+  meta?: {
     page: number;
-    pages: number;
+    limit: number;
+    total: number;
+    totalPage: number;
   };
 }
 
-export interface ProductsQueryParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  category?: string;
+export interface ProductResponse {
+  success: boolean;
+  message: string;
+  data: Product;
 }
 
 export const productsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getProducts: builder.query<ProductsResponse, ProductsQueryParams>({
-      query: (params) => ({
-        url: '/products',
-        params,
+    getProducts: builder.query<
+      {
+        products: Product[];
+        meta: { page: number; limit: number; total: number; totalPage: number };
+      },
+      ProductsQueryParams | void
+    >({
+      query: (params) => {
+        const queryParams: Record<string, string | number> = {};
+        if (params) {
+          if (params.search) queryParams.searchTerm = params.search;
+          if (params.page) queryParams.page = params.page;
+          if (params.limit) queryParams.limit = params.limit;
+        }
+        return {
+          url: '/products',
+          method: 'GET',
+          params: queryParams,
+        };
+      },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.products.map(({ _id }) => ({ type: 'Product' as const, id: _id })),
+              { type: 'Product', id: 'LIST' },
+            ]
+          : [{ type: 'Product', id: 'LIST' }],
+      transformResponse: (response: ProductsResponse) => ({
+        products: response.data,
+        meta: response.meta ?? { page: 1, limit: 10, total: 0, totalPage: 1 },
       }),
-      providesTags: ['Product'],
     }),
-    getProductById: builder.query<{ success: boolean; data: Product }, string>({
-      query: (id) => `/products/${id}`,
-    }),
-    createProduct: builder.mutation<{ success: boolean; data: Product }, FormData>({
+    createProduct: builder.mutation<Product, FormData>({
       query: (formData) => ({
         url: '/products',
         method: 'POST',
         body: formData,
       }),
-      invalidatesTags: ['Product', 'Dashboard'],
+      invalidatesTags: [{ type: 'Product', id: 'LIST' }, 'Dashboard'],
+      transformResponse: (response: ProductResponse) => response.data,
     }),
-    updateProduct: builder.mutation<
-      { success: boolean; data: Product },
-      { id: string; formData: FormData }
-    >({
+    updateProduct: builder.mutation<Product, { id: string; formData: FormData }>({
       query: ({ id, formData }) => ({
         url: `/products/${id}`,
         method: 'PATCH',
         body: formData,
       }),
-      invalidatesTags: ['Product', 'Dashboard'],
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: 'Product', id },
+        { type: 'Product', id: 'LIST' },
+        'Dashboard',
+      ],
+      transformResponse: (response: ProductResponse) => response.data,
     }),
     deleteProduct: builder.mutation<{ success: boolean; message: string }, string>({
       query: (id) => ({
         url: `/products/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Product', 'Dashboard'],
+      invalidatesTags: [{ type: 'Product', id: 'LIST' }, 'Dashboard'],
     }),
   }),
 });
 
 export const {
   useGetProductsQuery,
-  useGetProductByIdQuery,
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
 } = productsApi;
+export default productsApi;

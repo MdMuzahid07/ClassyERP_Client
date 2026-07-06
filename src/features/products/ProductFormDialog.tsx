@@ -3,7 +3,10 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { type Product } from '../../types/product';
-import { useCreateProductMutation, useUpdateProductMutation } from './productsApi';
+import {
+  useCreateProductMutation,
+  useUpdateProductMutation,
+} from '../../redux/features/products/productsApi';
 import { ImageUploadField } from '../../components/shared/ImageUploadField';
 import { X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -130,10 +133,13 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop overlay */}
-      <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs" onClick={onClose} />
+      <div
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs animate-backdrop-fade"
+        onClick={onClose}
+      />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg rounded-xl bg-white border border-slate-200 shadow-xl flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-lg rounded-xl bg-white border border-slate-200 shadow-xl flex flex-col max-h-[90vh] animate-modal-scale">
         {/* Header */}
         <div className="flex h-16 items-center justify-between px-6 border-b border-slate-100 flex-shrink-0">
           <h3 className="text-lg font-bold text-slate-950">
@@ -177,8 +183,10 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                 type="text"
                 disabled={isLoading}
                 {...register('name')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors ${
-                  errors.name ? 'border-red-300 focus:border-red-500' : 'border-slate-300'
+                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
+                  errors.name
+                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
+                    : 'border-slate-200'
                 }`}
                 placeholder="NexCore Processor X1"
               />
@@ -195,8 +203,10 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                 type="text"
                 disabled={isLoading}
                 {...register('sku')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors ${
-                  errors.sku ? 'border-red-300 focus:border-red-500' : 'border-slate-300'
+                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
+                  errors.sku
+                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
+                    : 'border-slate-200'
                 }`}
                 placeholder="CPU-NX-001"
               />
@@ -213,8 +223,10 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                 type="text"
                 disabled={isLoading}
                 {...register('category')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors ${
-                  errors.category ? 'border-red-300 focus:border-red-500' : 'border-slate-300'
+                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
+                  errors.category
+                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
+                    : 'border-slate-200'
                 }`}
                 placeholder="Hardware"
               />
@@ -237,8 +249,10 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                 step="0.01"
                 disabled={isLoading}
                 {...register('purchasePrice')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors ${
-                  errors.purchasePrice ? 'border-red-300 focus:border-red-500' : 'border-slate-300'
+                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
+                  errors.purchasePrice
+                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
+                    : 'border-slate-200'
                 }`}
                 placeholder="120.00"
               />
@@ -261,8 +275,10 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                 step="0.01"
                 disabled={isLoading}
                 {...register('sellingPrice')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors ${
-                  errors.sellingPrice ? 'border-red-300 focus:border-red-500' : 'border-slate-300'
+                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
+                  errors.sellingPrice
+                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
+                    : 'border-slate-200'
                 }`}
                 placeholder="199.99"
               />
@@ -284,8 +300,10 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                 type="number"
                 disabled={isLoading}
                 {...register('stockQuantity')}
-                className={`block w-full rounded-lg border px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors ${
-                  errors.stockQuantity ? 'border-red-300 focus:border-red-500' : 'border-slate-300'
+                className={`block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all ${
+                  errors.stockQuantity
+                    ? 'border-red-200 focus:ring-red-600/5 focus:border-red-500'
+                    : 'border-slate-200'
                 }`}
                 placeholder="100"
               />

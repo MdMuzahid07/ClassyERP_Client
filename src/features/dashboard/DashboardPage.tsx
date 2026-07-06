@@ -1,38 +1,43 @@
-import React from 'react';
-import { useGetDashboardStatsQuery } from './dashboardApi';
+import React, { useEffect } from 'react';
+import { useGetDashboardStatsQuery } from '../../redux/features/dashboard/dashboardApi';
 import { StatCard } from '../../components/shared/StatCard';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { LowStockTable } from './LowStockTable';
 import { Package, ShoppingCart, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
-
-export const DashboardSkeleton: React.FC = () => {
-  return (
-    <div className="space-y-8 animate-pulse">
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="h-24 bg-white border border-slate-200 rounded-xl p-6 flex items-center justify-between shadow-xs"
-          >
-            <div className="space-y-3 flex-1">
-              <div className="h-4 bg-slate-200 rounded w-1/3" />
-              <div className="h-7 bg-slate-200 rounded w-1/2" />
-            </div>
-            <div className="h-12 w-12 bg-slate-200 rounded-lg" />
-          </div>
-        ))}
-      </div>
-
-      <div className="space-y-4">
-        <div className="h-6 bg-slate-200 rounded w-1/4" />
-        <div className="bg-white border border-slate-200 rounded-xl h-64" />
-      </div>
-    </div>
-  );
-};
+import { getSocket } from '../../lib/socket';
+import { useAppDispatch } from '../../app/hooks';
+import { baseApi } from '../../redux/api/baseApi';
+import { toast } from 'sonner';
+import { DashboardSkeleton } from '../../skeleton/DashboardSkeleton';
 
 export const DashboardPage: React.FC = () => {
+  const dispatch = useAppDispatch();
   const { data, isLoading, error, refetch } = useGetDashboardStatsQuery();
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleLowStockAlert = (payload: { name: string; stockQuantity: number }) => {
+      toast.warning(
+        `Low Stock Warning: ${payload.name} has only ${payload.stockQuantity} items left!`
+      );
+      dispatch(baseApi.util.invalidateTags(['Dashboard']));
+    };
+
+    const handleNewSale = () => {
+      toast.info('New sale checkout completed!');
+      dispatch(baseApi.util.invalidateTags(['Dashboard']));
+    };
+
+    socket.on('lowStockAlert', handleLowStockAlert);
+    socket.on('newSale', handleNewSale);
+
+    return () => {
+      socket.off('lowStockAlert', handleLowStockAlert);
+      socket.off('newSale', handleNewSale);
+    };
+  }, [dispatch]);
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -65,7 +70,7 @@ export const DashboardPage: React.FC = () => {
   const { totalProducts = 0, totalSales = 0, lowStockProducts = [] } = data ?? {};
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-page-entrance">
       {/* 3 Stat Cards Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Menu, LogOut } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { logout } from '../../redux/features/auth/authSlice';
 import { useNavigate, useLocation } from 'react-router';
 import { RoleBadge } from './RoleBadge';
+import { ConfirmDialog } from '../shared/ConfirmDialog';
 
 interface TopbarProps {
   onMenuClick: () => void;
@@ -14,8 +15,10 @@ export const Topbar: React.FC<TopbarProps> = ({ onMenuClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const user = useAppSelector((state) => state.auth.user);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogoutConfirm = () => {
+    setShowLogoutConfirm(false);
     dispatch(logout());
     void navigate('/login');
   };
@@ -75,14 +78,25 @@ export const Topbar: React.FC<TopbarProps> = ({ onMenuClick }) => {
 
         <button
           type="button"
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 rounded-lg p-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+          onClick={() => setShowLogoutConfirm(true)}
+          className="flex items-center gap-1.5 rounded-lg p-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
           title="Log out"
         >
           <LogOut className="h-5 w-5" />
           <span className="hidden md:inline text-sm font-medium">Logout</span>
         </button>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogoutConfirm}
+        title="Confirm Logout"
+        description="Are you sure you want to sign out of ClassyERP? You will need to log back in to access dashboard analytics and inventory tools."
+        confirmText="Log Out"
+        isDestructive={true}
+      />
     </header>
   );
 };

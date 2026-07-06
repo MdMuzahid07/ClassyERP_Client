@@ -1,25 +1,21 @@
 import { baseApi } from '../../api/baseApi';
+import { type DashboardStats } from '../../../types/dashboard';
 
-export interface DashboardStats {
-  totalProducts: number;
-  totalCustomers: number;
-  totalSales: number;
-  lowStockProducts: {
-    _id: string;
-    name: string;
-    sku: string;
-    stockQuantity: number;
-    sellingPrice: number;
-  }[];
+export interface DashboardResponse {
+  success: boolean;
+  message: string;
+  data: DashboardStats;
 }
 
 export const dashboardApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getDashboardStats: builder.query<DashboardStats, void>({
-      query: () => '/dashboard/stats',
+      query: () => '/dashboard',
       providesTags: ['Dashboard'],
+      transformResponse: (response: DashboardResponse) => response.data,
     }),
   }),
 });
 
 export const { useGetDashboardStatsQuery } = dashboardApi;
+export default dashboardApi;

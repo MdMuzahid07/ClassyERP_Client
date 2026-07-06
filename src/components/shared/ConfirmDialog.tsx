@@ -29,10 +29,13 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop overlay */}
-      <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs" onClick={onClose} />
+      <div
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs animate-backdrop-fade"
+        onClick={onClose}
+      />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-md rounded-xl bg-white border border-slate-200 p-6 shadow-xl space-y-4 transition-all transform scale-100">
+      <div className="relative w-full max-w-md rounded-xl bg-white border border-slate-200 p-6 shadow-xl space-y-4 animate-modal-scale">
         <div className="flex items-start gap-4">
           <div
             className={`p-3 rounded-full flex-shrink-0 ${

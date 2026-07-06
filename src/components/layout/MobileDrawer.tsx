@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router';
 import { X } from 'lucide-react';
 import { SidebarContent } from './Sidebar';
+import { ClassyLogo } from '../shared/ClassyLogo';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -28,9 +29,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
       {/* Drawer content panel */}
       <div className="fixed inset-y-0 left-0 flex w-full max-w-xs flex-col bg-slate-900 shadow-xl transition-transform duration-300">
         <div className="flex h-16 items-center justify-between px-6 border-b border-slate-800">
-          <span className="text-xl font-bold text-white tracking-wide">
-            Classy<span className="text-blue-500">ERP</span>
-          </span>
+          <ClassyLogo className="h-8" lightText />
           <button
             type="button"
             className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"

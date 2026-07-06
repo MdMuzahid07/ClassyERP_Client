@@ -19,6 +19,8 @@ const NAV_ITEMS: NavItem[] = [
   { name: 'Users', path: '/users', permission: 'user:manage', icon: Users },
 ];
 
+import { ClassyLogo } from '../shared/ClassyLogo';
+
 export const SidebarContent: React.FC<{ onItemClick?: () => void }> = ({ onItemClick }) => {
   const user = useAppSelector((state) => state.auth.user);
   const role = user?.role;
@@ -32,9 +34,7 @@ export const SidebarContent: React.FC<{ onItemClick?: () => void }> = ({ onItemC
     <div className="flex h-full flex-col bg-slate-900 text-slate-300">
       {/* Brand Header */}
       <div className="flex h-16 items-center px-6 border-b border-slate-800">
-        <span className="text-xl font-bold text-white tracking-wide">
-          Classy<span className="text-blue-500">ERP</span>
-        </span>
+        <ClassyLogo className="h-8" lightText />
       </div>
 
       {/* Navigation List */}
