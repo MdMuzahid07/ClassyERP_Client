@@ -5,15 +5,7 @@ import { LoginPage } from '../features/auth/LoginPage';
 import { ProtectedRoute } from '../features/auth/ProtectedRoute';
 import { RoleGuard } from '../features/auth/RoleGuard';
 import { DashboardPage } from '../features/dashboard/DashboardPage';
-
-const ProductsPlaceholder = () => (
-  <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs">
-    <h2 className="text-xl font-semibold mb-2">Products Inventory</h2>
-    <p className="text-slate-600 text-sm">
-      Products management table will be configured in Phase 4.
-    </p>
-  </div>
-);
+import { ProductsPage } from '../features/products/ProductsPage';
 
 const CreateSalePlaceholder = () => (
   <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs">
@@ -71,7 +63,7 @@ export const AppRoutes: React.FC = () => {
             path="products"
             element={
               <RoleGuard requiredPermission="product:read">
-                <ProductsPlaceholder />
+                <ProductsPage />
               </RoleGuard>
             }
           />

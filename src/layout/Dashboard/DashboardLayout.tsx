@@ -12,7 +12,7 @@ export const DashboardLayout: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    void navigate('/login');
   };
 
   return (
@@ -24,15 +24,24 @@ export const DashboardLayout: React.FC = () => {
             <img src="/classy-logo.png" alt="ClassyERP Logo" className="h-8" />
             <span className="font-bold text-lg">ClassyERP</span>
           </div>
-          
+
           <nav className="space-y-2">
-            <Link to="/dashboard" className="block px-4 py-2 rounded hover:bg-muted transition-colors">
+            <Link
+              to="/dashboard"
+              className="block px-4 py-2 rounded hover:bg-muted transition-colors"
+            >
               Dashboard
             </Link>
-            <Link to="/dashboard/products" className="block px-4 py-2 rounded hover:bg-muted transition-colors">
+            <Link
+              to="/dashboard/products"
+              className="block px-4 py-2 rounded hover:bg-muted transition-colors"
+            >
               Products
             </Link>
-            <Link to="/dashboard/sales/create" className="block px-4 py-2 rounded hover:bg-muted transition-colors">
+            <Link
+              to="/dashboard/sales/create"
+              className="block px-4 py-2 rounded hover:bg-muted transition-colors"
+            >
               Create Sale
             </Link>
           </nav>
@@ -45,7 +54,7 @@ export const DashboardLayout: React.FC = () => {
               <p className="text-xs text-muted-foreground uppercase">{user.role}</p>
             </div>
           )}
-          
+
           <div className="flex items-center justify-between px-4">
             <button
               onClick={toggleTheme}
