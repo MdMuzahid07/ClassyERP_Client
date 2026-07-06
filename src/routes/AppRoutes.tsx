@@ -4,13 +4,7 @@ import { AppShell } from '../components/layout/AppShell';
 import { LoginPage } from '../features/auth/LoginPage';
 import { ProtectedRoute } from '../features/auth/ProtectedRoute';
 import { RoleGuard } from '../features/auth/RoleGuard';
-
-const DashboardPlaceholder = () => (
-  <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs">
-    <h2 className="text-xl font-semibold mb-2">Dashboard Analytics</h2>
-    <p className="text-slate-600 text-sm">Dashboard content will be configured in Phase 3.</p>
-  </div>
-);
+import { DashboardPage } from '../features/dashboard/DashboardPage';
 
 const ProductsPlaceholder = () => (
   <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-xs">
@@ -68,7 +62,7 @@ export const AppRoutes: React.FC = () => {
             path="dashboard"
             element={
               <RoleGuard requiredPermission="dashboard:read">
-                <DashboardPlaceholder />
+                <DashboardPage />
               </RoleGuard>
             }
           />
