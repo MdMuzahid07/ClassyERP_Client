@@ -32,7 +32,7 @@ export const salesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getSales: builder.query<SalesResponse, void>({
       query: () => '/sales',
-      providesTags: ['sales'],
+      providesTags: ['Sale'],
     }),
     createSale: builder.mutation<{ success: boolean; data: Sale }, CreateSaleRequest>({
       query: (saleData) => ({
@@ -40,7 +40,7 @@ export const salesApi = baseApi.injectEndpoints({
         method: 'POST',
         body: saleData,
       }),
-      invalidatesTags: ['sales', 'products', 'dashboard'],
+      invalidatesTags: ['Sale', 'Product', 'Dashboard'],
     }),
   }),
 });

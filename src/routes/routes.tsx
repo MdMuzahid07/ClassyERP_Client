@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { PrivateRoute } from '../auth/PrivateRoute';
-import { DashboardLayout } from '../layout/Dashboard/DashboardLayout';
+import { AppShell } from '../components/layout/AppShell';
 import { Login } from '../pages/Login';
 import { DashboardHome } from '../pages/dashboard/DashboardHome';
 import { Products } from '../pages/dashboard/Products';
@@ -17,22 +17,20 @@ export const AppRoutes: React.FC = () => {
 
         {/* Protected routes */}
         <Route
-          path="/dashboard"
+          path="/"
           element={
             <PrivateRoute>
-              <DashboardLayout />
+              <AppShell />
             </PrivateRoute>
           }
         >
-          {/* Default dashboard path */}
-          <Route index element={<DashboardHome />} />
-          
+          {/* Default redirection */}
+          <Route index element={<Navigate to="/dashboard" replace />} />
+
+          <Route path="dashboard" element={<DashboardHome />} />
           <Route path="products" element={<Products />} />
           <Route path="sales/create" element={<CreateSale />} />
         </Route>
-
-        {/* Root path redirect */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         {/* Catch-all 404 */}
         <Route path="*" element={<NotFound />} />
