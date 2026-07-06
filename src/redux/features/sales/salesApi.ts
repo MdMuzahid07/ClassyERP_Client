@@ -1,5 +1,5 @@
 import { baseApi } from '../../api/baseApi';
-import { Product } from '../products/productsApi';
+import type { Product } from '../products/productsApi';
 
 export interface SaleItem {
   product: string | Product;
@@ -22,10 +22,10 @@ export interface SalesResponse {
 
 export interface CreateSaleRequest {
   customer: string;
-  products: Array<{
+  products: {
     product: string;
     quantity: number;
-  }>;
+  }[];
 }
 
 export const salesApi = baseApi.injectEndpoints({

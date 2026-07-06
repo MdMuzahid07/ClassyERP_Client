@@ -1,16 +1,13 @@
 import React from 'react';
 import { Navigate } from 'react-router';
-import { useAppSelector } from '../redux/hooks';
+import { useAppSelector } from '../app/hooks';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
-  allowedRoles?: Array<'Admin' | 'Manager' | 'Employee'>;
+  allowedRoles?: ('Admin' | 'Manager' | 'Employee')[];
 }
 
-export const PrivateRoute: React.FC<PrivateRouteProps> = ({
-  children,
-  allowedRoles,
-}) => {
+export const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
   if (!isAuthenticated || !user) {

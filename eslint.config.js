@@ -54,11 +54,6 @@ export default defineConfig([
       },
     },
 
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-    },
-
     extends: [
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,

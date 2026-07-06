@@ -1,59 +1,48 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'Admin' | 'Manager' | 'Employee';
-}
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { type User } from '../../../types/user';
 
 interface AuthState {
   user: User | null;
-  accessToken: string | null;
+  token: string | null;
   isAuthenticated: boolean;
 }
 
-let parsedUser = null;
+let parsedUser: User | null = null;
 try {
   const savedUser = localStorage.getItem('user');
   if (savedUser) {
-    parsedUser = JSON.parse(savedUser);
+    parsedUser = JSON.parse(savedUser) as User;
   }
 } catch (error) {
   console.error('Failed to parse user from localStorage:', error);
   localStorage.removeItem('user');
-  localStorage.removeItem('accessToken');
+  localStorage.removeItem('erp_token');
 }
 
 const initialState: AuthState = {
   user: parsedUser,
-  accessToken: localStorage.getItem('accessToken') || null,
-  isAuthenticated: !!localStorage.getItem('accessToken'),
+  token: localStorage.getItem('erp_token') ?? null,
+  isAuthenticated: !!localStorage.getItem('erp_token'),
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setCredentials: (
-      state,
-      action: PayloadAction<{ user: User | null; accessToken: string }>
-    ) => {
-      const { user, accessToken } = action.payload;
-      if (user) {
-        state.user = user;
-        localStorage.setItem('user', JSON.stringify(user));
-      }
-      state.accessToken = accessToken;
+    setCredentials: (state, action: PayloadAction<{ user: User; token: string }>) => {
+      const { user, token } = action.payload;
+      state.user = user;
+      state.token = token;
       state.isAuthenticated = true;
-      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('erp_token', token);
     },
     logout: (state) => {
       state.user = null;
-      state.accessToken = null;
+      state.token = null;
       state.isAuthenticated = false;
       localStorage.removeItem('user');
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem('erp_token');
     },
   },
 });

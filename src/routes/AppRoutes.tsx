@@ -1,40 +1,40 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
-import { RootLayout } from '../layouts/RootLayout';
-import { LoginPage } from '../features/auth/pages/LoginPage';
-import { DashboardPage } from '../features/dashboard/pages/DashboardPage';
-import { ProductsPage } from '../features/products/pages/ProductsPage';
-import { CreateSalePage } from '../features/sales/pages/CreateSalePage';
+import { DashboardLayout } from '../layout/Dashboard/DashboardLayout';
+import { Login } from '../pages/Login';
+import { DashboardHome } from '../pages/dashboard/DashboardHome';
+import { Products } from '../pages/dashboard/Products';
+import { CreateSale } from '../pages/dashboard/CreateSale';
 import { NotFound } from '../pages/NotFound';
-import { ProtectedRoute } from './ProtectedRoute';
+import { PrivateRoute } from '../auth/PrivateRoute';
 
 export const AppRoutes: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<Login />} />
 
         {/* Protected Core Layout Routes */}
         <Route
           path="/"
           element={
-            <ProtectedRoute>
-              <RootLayout />
-            </ProtectedRoute>
+            <PrivateRoute>
+              <DashboardLayout />
+            </PrivateRoute>
           }
         >
           {/* Default Route redirection */}
           <Route index element={<Navigate to="/dashboard" replace />} />
 
           {/* Dashboard Route */}
-          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="dashboard" element={<DashboardHome />} />
 
-          {/* Product Module - Employee, Manager, Admin can view */}
-          <Route path="products" element={<ProductsPage />} />
+          {/* Product Module */}
+          <Route path="products" element={<Products />} />
 
-          {/* Sales Module - Employee, Manager, Admin can create sales */}
-          <Route path="sales/create" element={<CreateSalePage />} />
+          {/* Sales Module */}
+          <Route path="sales/create" element={<CreateSale />} />
         </Route>
 
         {/* 404 Route */}
